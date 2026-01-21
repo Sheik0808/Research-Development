@@ -1,0 +1,157 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container-fluid py-5" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh;">
+    <div class="container">
+        <div class="row">
+            <!-- Vision Section -->
+            <div class="col-lg-6 mb-4">
+                <div class="card h-100" style="border-radius: 15px; border: none; box-shadow: 0 10px 30px rgba(0,0,0,0.2); overflow: hidden;">
+                    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px; color: white; text-align: center;">
+                        <i class="bi bi-eye-fill" style="font-size: 48px; margin-bottom: 15px;"></i>
+                        <h2 style="margin: 0; font-weight: bold;">Our Vision</h2>
+                    </div>
+                    <div class="card-body p-5" style="background: #f8f9fa;">
+                        <p class="lead" style="text-align: justify; line-height: 1.8; color: #333; font-size: 16px;">
+                            {{ vision }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mission Section -->
+            <div class="col-lg-6 mb-4">
+                <div class="card h-100" style="border-radius: 15px; border: none; box-shadow: 0 10px 30px rgba(0,0,0,0.2); overflow: hidden;">
+                    <div style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); padding: 30px; color: white; text-align: center;">
+                        <i class="bi bi-target" style="font-size: 48px; margin-bottom: 15px;"></i>
+                        <h2 style="margin: 0; font-weight: bold;">Our Mission</h2>
+                    </div>
+                    <div class="card-body p-5" style="background: #f8f9fa;">
+                        <div style="text-align: justify; line-height: 1.8; color: #333; font-size: 16px;">
+                            {{ mission | replace('\n', '<br>') | safe }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Core Values Section -->
+        <div class="row mt-5">
+            <div class="col-12">
+                <h2 style="color: white; text-align: center; margin-bottom: 40px; font-weight: bold;">
+                    <i class="bi bi-heart-fill"></i> Our Core Values
+                </h2>
+            </div>
+        </div>
+
+        <div class="row">
+            <!-- Value 1 -->
+            <div class="col-md-6 col-lg-4 mb-4">
+                <div class="card h-100" style="border-radius: 15px; border: 2px solid #667eea; background: white; transition: all 0.3s ease;">
+                    <div class="card-body text-center p-4">
+                        <i class="bi bi-brightness-high-fill" style="font-size: 40px; color: #667eea; margin-bottom: 15px;"></i>
+                        <h5 class="card-title mb-3" style="font-weight: bold; color: #333;">Excellence</h5>
+                        <p class="card-text" style="color: #666;">
+                            We strive for excellence in all our research and academic endeavors.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Value 2 -->
+            <div class="col-md-6 col-lg-4 mb-4">
+                <div class="card h-100" style="border-radius: 15px; border: 2px solid #764ba2; background: white; transition: all 0.3s ease;">
+                    <div class="card-body text-center p-4">
+                        <i class="bi bi-people-fill" style="font-size: 40px; color: #764ba2; margin-bottom: 15px;"></i>
+                        <h5 class="card-title mb-3" style="font-weight: bold; color: #333;">Collaboration</h5>
+                        <p class="card-text" style="color: #666;">
+                            We believe in the power of teamwork and collaborative research efforts.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Value 3 -->
+            <div class="col-md-6 col-lg-4 mb-4">
+                <div class="card h-100" style="border-radius: 15px; border: 2px solid #f5576c; background: white; transition: all 0.3s ease;">
+                    <div class="card-body text-center p-4">
+                        <i class="bi bi-lightbulb-fill" style="font-size: 40px; color: #f5576c; margin-bottom: 15px;"></i>
+                        <h5 class="card-title mb-3" style="font-weight: bold; color: #333;">Innovation</h5>
+                        <p class="card-text" style="color: #666;">
+                            We foster creativity and embrace innovative approaches to research.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Value 4 -->
+            <div class="col-md-6 col-lg-4 mb-4">
+                <div class="card h-100" style="border-radius: 15px; border: 2px solid #4facfe; background: white; transition: all 0.3s ease;">
+                    <div class="card-body text-center p-4">
+                        <i class="bi bi-shield-check" style="font-size: 40px; color: #4facfe; margin-bottom: 15px;"></i>
+                        <h5 class="card-title mb-3" style="font-weight: bold; color: #333;">Integrity</h5>
+                        <p class="card-text" style="color: #666;">
+                            We maintain the highest standards of ethical conduct and transparency.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Value 5 -->
+            <div class="col-md-6 col-lg-4 mb-4">
+                <div class="card h-100" style="border-radius: 15px; border: 2px solid #00f2fe; background: white; transition: all 0.3s ease;">
+                    <div class="card-body text-center p-4">
+                        <i class="bi bi-graph-up" style="font-size: 40px; color: #00f2fe; margin-bottom: 15px;"></i>
+                        <h5 class="card-title mb-3" style="font-weight: bold; color: #333;">Growth</h5>
+                        <p class="card-text" style="color: #666;">
+                            We are committed to continuous improvement and professional development.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Value 6 -->
+            <div class="col-md-6 col-lg-4 mb-4">
+                <div class="card h-100" style="border-radius: 15px; border: 2px solid #fa709a; background: white; transition: all 0.3s ease;">
+                    <div class="card-body text-center p-4">
+                        <i class="bi bi-globe" style="font-size: 40px; color: #fa709a; margin-bottom: 15px;"></i>
+                        <h5 class="card-title mb-3" style="font-weight: bold; color: #333;">Impact</h5>
+                        <p class="card-text" style="color: #666;">
+                            We aim to make meaningful contributions to society through research.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Call to Action -->
+        <div class="row mt-5 mb-5">
+            <div class="col-12">
+                <div class="card" style="border-radius: 15px; border: none; background: white; box-shadow: 0 10px 30px rgba(0,0,0,0.2);">
+                    <div class="card-body p-5 text-center">
+                        <h3 style="color: #333; margin-bottom: 15px; font-weight: bold;">Ready to Join Our Research Community?</h3>
+                        <p style="color: #666; margin-bottom: 25px; font-size: 16px;">
+                            Start your journey with us today and be part of transforming ideas into groundbreaking research.
+                        </p>
+                        <a href="{{ url_for('dashboard') }}" class="btn btn-lg" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 8px; padding: 12px 40px; font-weight: bold;">
+                            <i class="bi bi-arrow-right-circle"></i> Go to Dashboard
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 40px rgba(0,0,0,0.15) !important;
+    }
+
+    .btn:hover {
+        transform: scale(1.05);
+        transition: all 0.3s ease;
+    }
+</style>
+{% endblock %}

@@ -1,0 +1,262 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container-fluid dashboard-container">
+
+    <!-- Welcome Message on First Visit -->
+    {% if is_first_visit %}
+    <div class="alert alert-success alert-dismissible fade show mb-4" role="alert" style="border-radius: 10px; border: 3px solid #28a745; padding: 20px;">
+        <div style="text-align: center;">
+            <h4 style="color: #28a745; margin-bottom: 10px;">
+                <i class="bi bi-hand-thumbs-up-fill"></i> Welcome, Admin!
+            </h4>
+            <p style="font-size: 16px; margin: 0; color: #333;">
+                Thank you for accessing the R&D Management System! 
+                <br>
+                <strong>Your race has been started... Keep doing great work!</strong> 🚀
+            </p>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endif %}
+
+    <!-- Motivational Quote Section -->
+    {% if motivational_quote %}
+    <div class="alert alert-info alert-dismissible fade show mb-4" role="alert" style="border-radius: 10px; border: 2px solid #667eea;">
+        <div style="text-align: center;">
+            <i class="bi bi-quote" style="font-size: 24px; color: #667eea;"></i>
+            <p class="mb-0 mt-2" style="font-style: italic; font-size: 16px; color: #333;">
+                {{ motivational_quote }}
+            </p>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endif %}
+
+    <!-- Admin Header -->
+    <div class="header-section mb-5">
+        <div class="header-background">
+            <svg class="header-decoration" viewBox="0 0 1200 300" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <linearGradient id="headerGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#FF6B6B;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#FF8E72;stop-opacity:1" />
+                    </linearGradient>
+                </defs>
+                <rect width="1200" height="300" fill="url(#headerGrad)"/>
+                <circle cx="100" cy="50" r="80" fill="rgba(255,255,255,0.1)"/>
+                <circle cx="1100" cy="250" r="120" fill="rgba(255,255,255,0.1)"/>
+                <path d="M0 200 Q300 150 600 200 T1200 200 L1200 300 L0 300 Z" fill="rgba(255,255,255,0.05)"/>
+            </svg>
+        </div>
+        <div class="header-content text-center text-white">
+            <h1 class="display-4 fw-bold mb-2">
+                <i class="bi bi-shield-lock-fill"></i> Admin Dashboard
+            </h1>
+            <p class="fs-5 mb-0">Complete System Overview & Analytics</p>
+            <p class="small mt-2 opacity-75">Monitor all publications, users, and system performance</p>
+        </div>
+    </div>
+
+    <!-- Key Metrics Grid -->
+    <div class="row g-4 mb-5">
+        <!-- Total Publications -->
+        <div class="col-md-6 col-lg-3">
+            <div class="card" style="border: none; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                <div class="card-body">
+                    <h6 class="card-title mb-2"><i class="bi bi-journal-text"></i> Total Publications</h6>
+                    <h2 style="font-size: 36px; font-weight: bold; margin: 0;">{{ total_journals }}</h2>
+                    <small class="opacity-75">Indexed papers</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Total Users -->
+        <div class="col-md-6 col-lg-3">
+            <div class="card" style="border: none; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); background: linear-gradient(135deg, #56ab2f 0%, #a8e063 100%); color: white;">
+                <div class="card-body">
+                    <h6 class="card-title mb-2"><i class="bi bi-people-fill"></i> Total Users</h6>
+                    <h2 style="font-size: 36px; font-weight: bold; margin: 0;">{{ total_users }}</h2>
+                    <small class="opacity-75">Active members</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Faculty Count -->
+        <div class="col-md-6 col-lg-3">
+            <div class="card" style="border: none; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); background: linear-gradient(135deg, #FF6B6B 0%, #FF8E72 100%); color: white;">
+                <div class="card-body">
+                    <h6 class="card-title mb-2"><i class="bi bi-person-badge"></i> Faculty</h6>
+                    <h2 style="font-size: 36px; font-weight: bold; margin: 0;">{{ total_faculty }}</h2>
+                    <small class="opacity-75">Active faculty</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Student Count -->
+        <div class="col-md-6 col-lg-3">
+            <div class="card" style="border: none; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white;">
+                <div class="card-body">
+                    <h6 class="card-title mb-2"><i class="bi bi-mortarboard"></i> Students</h6>
+                    <h2 style="font-size: 36px; font-weight: bold; margin: 0;">{{ total_students }}</h2>
+                    <small class="opacity-75">Active students</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Total Credits Distributed -->
+        <div class="col-md-6 col-lg-3">
+            <div class="card" style="border: none; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%); color: white;">
+                <div class="card-body">
+                    <h6 class="card-title mb-2"><i class="bi bi-star-fill"></i> Credits Distributed</h6>
+                    <h2 style="font-size: 36px; font-weight: bold; margin: 0;">{{ total_credits_distributed }}</h2>
+                    <small class="opacity-75">Total credits</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Top Performers -->
+    <div class="row g-4 mb-5">
+        <div class="col-lg-6">
+            <div class="card" style="border: none; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+                <div class="card-header" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 12px 12px 0 0; padding: 20px;">
+                    <h5 class="mb-0"><i class="bi bi-trophy-fill"></i> Top Performers</h5>
+                </div>
+                <div class="card-body">
+                    {% if top_performers %}
+                    <div style="max-height: 400px; overflow-y: auto;">
+                        {% for performer in top_performers %}
+                        <div style="border-bottom: 1px solid #eee; padding: 12px 0; display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <strong>{{ performer['full_name'] }}</strong>
+                                <br>
+                                <small class="text-muted">{{ performer['department'] or 'N/A' }} ({{ performer['role'].upper() }})</small>
+                            </div>
+                            <span class="badge bg-warning text-dark" style="font-size: 14px;">
+                                ⭐ {{ performer['credits'] }}
+                            </span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <p class="text-muted mb-0">No performers yet</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Indexing Statistics -->
+        <div class="col-lg-6">
+            <div class="card" style="border: none; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+                <div class="card-header" style="background: linear-gradient(135deg, #56ab2f 0%, #a8e063 100%); color: white; border: none; border-radius: 12px 12px 0 0; padding: 20px;">
+                    <h5 class="mb-0"><i class="bi bi-bar-chart-fill"></i> Indexing Statistics</h5>
+                </div>
+                <div class="card-body">
+                    <div style="display: flex; justify-content: space-around; text-align: center;">
+                        <div>
+                            <h4 style="color: #667eea;">{{ indexing_stats.scopus }}</h4>
+                            <p class="mb-0">SCOPUS</p>
+                        </div>
+                        <div>
+                            <h4 style="color: #FF6B6B;">{{ indexing_stats.sci }}</h4>
+                            <p class="mb-0">SCI/SCIE</p>
+                        </div>
+                        <div>
+                            <h4 style="color: #56ab2f;">{{ indexing_stats.wos }}</h4>
+                            <p class="mb-0">WOS</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- All Publishers Table -->
+    <div class="card" style="border: none; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+        <div class="card-header" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white; border: none; border-radius: 12px 12px 0 0; padding: 20px;">
+            <h5 class="mb-0"><i class="bi bi-people-fill"></i> All Publishers & Contributors Data</h5>
+        </div>
+        <div class="card-body">
+            {% if all_publishers %}
+            <div style="overflow-x: auto;">
+                <table class="table table-hover" style="margin-bottom: 0;">
+                    <thead style="background-color: #f8f9fa;">
+                        <tr>
+                            <th style="border: none;">Name</th>
+                            <th style="border: none;">Email</th>
+                            <th style="border: none;">Role</th>
+                            <th style="border: none;">Department</th>
+                            <th style="border: none;">Credits</th>
+                            <th style="border: none;">Publications</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for publisher in all_publishers %}
+                        <tr>
+                            <td><strong>{{ publisher['full_name'] }}</strong></td>
+                            <td>{{ publisher['email'] }}</td>
+                            <td>
+                                <span class="badge {% if publisher['role'] == 'admin' %}bg-danger{% elif publisher['role'] == 'faculty' %}bg-primary{% else %}bg-secondary{% endif %}">
+                                    {{ publisher['role'].upper() }}
+                                </span>
+                            </td>
+                            <td>{{ publisher['department'] or 'N/A' }}</td>
+                            <td>
+                                <span class="badge bg-warning text-dark">
+                                    <i class="bi bi-star-fill"></i> {{ publisher['credits'] }}
+                                </span>
+                            </td>
+                            <td>
+                                <span class="badge bg-info">{{ publisher['publication_count'] }}</span>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <p class="text-muted mb-0">No publishers data available</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <br>
+</div>
+
+<style>
+    .dashboard-container {
+        padding: 30px 0;
+        background-color: #f8f9fa;
+        min-height: 100vh;
+    }
+
+    .header-section {
+        margin-bottom: 40px;
+    }
+
+    .header-background {
+        position: relative;
+        height: 250px;
+        overflow: hidden;
+        border-radius: 15px;
+        margin-bottom: -50px;
+        z-index: 1;
+    }
+
+    .header-decoration {
+        width: 100%;
+        height: 100%;
+    }
+
+    .header-content {
+        position: relative;
+        z-index: 2;
+        padding: 40px 20px;
+    }
+
+    .table-hover tbody tr:hover {
+        background-color: #f5f5f5;
+    }
+</style>
+{% endblock %}

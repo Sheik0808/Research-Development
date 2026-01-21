@@ -1,0 +1,138 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container-fluid py-5" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; display: flex; align-items: center; justify-content: center;">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 mx-auto">
+                <!-- Main Thank You Card -->
+                <div class="card" style="border: none; border-radius: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); overflow: hidden;">
+                    <div style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%); padding: 50px; text-align: center; color: white;">
+                        <i class="bi bi-check-circle-fill" style="font-size: 80px; margin-bottom: 20px; animation: pulse 1s infinite;"></i>
+                        <h1 style="font-weight: bold; margin-bottom: 10px; font-size: 42px;">Thank You!</h1>
+                        <p style="font-size: 20px; margin: 0; opacity: 0.9;">Your publication has been successfully submitted</p>
+                    </div>
+
+                    <div class="card-body p-5">
+                        <!-- Publication Details -->
+                        <div class="alert alert-light border-2" style="border-color: #667eea !important; border-radius: 10px; margin-bottom: 30px;">
+                            <div style="text-align: center;">
+                                <h5 style="color: #667eea; font-weight: bold; margin-bottom: 15px;">
+                                    <i class="bi bi-file-earmark-text"></i> Publication Details
+                                </h5>
+                                <p style="font-size: 18px; color: #333; margin: 0;">
+                                    <strong>{{ publication_title }}</strong>
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Credits Earned -->
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <div class="card" style="border: 2px solid #ffc107; border-radius: 10px; background: linear-gradient(135deg, #fff3cd 0%, #fffbea 100%);">
+                                    <div class="card-body text-center">
+                                        <i class="bi bi-star-fill" style="font-size: 40px; color: #ffc107; margin-bottom: 10px;"></i>
+                                        <h6 style="color: #666; margin-bottom: 5px;">Credits Earned</h6>
+                                        <h3 style="color: #ffc107; font-weight: bold; margin: 0;">+{{ credits_earned }}</h3>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card" style="border: 2px solid #667eea; border-radius: 10px; background: linear-gradient(135deg, #e7f3ff 0%, #f0f8ff 100%);">
+                                    <div class="card-body text-center">
+                                        <i class="bi bi-award-fill" style="font-size: 40px; color: #667eea; margin-bottom: 10px;"></i>
+                                        <h6 style="color: #666; margin-bottom: 5px;">Total Credits</h6>
+                                        <h3 style="color: #667eea; font-weight: bold; margin: 0;">{{ user_credits }}</h3>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Motivational Message -->
+                        <div class="alert alert-success" style="border-radius: 10px; border: 2px solid #28a745; margin-bottom: 30px;">
+                            <div style="text-align: center;">
+                                <i class="bi bi-lightning-fill" style="font-size: 24px; color: #28a745; margin-bottom: 10px;"></i>
+                                <h5 style="color: #155724; margin-bottom: 10px; font-weight: bold;">🚀 Your Race Continues...</h5>
+                                <p style="color: #155724; margin: 0; font-size: 16px;">
+                                    <strong>Keep doing great work! 🎯 Every publication brings you closer to excellence!</strong>
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Inspirational Quote -->
+                        {% if motivational_quote %}
+                        <div class="alert alert-info" style="border-radius: 10px; border: 2px solid #667eea; text-align: center; margin-bottom: 30px;">
+                            <i class="bi bi-quote" style="font-size: 20px; color: #667eea;"></i>
+                            <p style="font-style: italic; color: #333; margin-top: 10px; margin-bottom: 0; font-size: 15px;">
+                                {{ motivational_quote }}
+                            </p>
+                        </div>
+                        {% endif %}
+
+                        <!-- Action Buttons -->
+                        <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; margin-top: 30px;">
+                            <a href="{{ url_for('add_journal') }}" class="btn btn-lg" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 8px; padding: 12px 40px; font-weight: bold; transition: all 0.3s ease;">
+                                <i class="bi bi-plus-circle me-2"></i>Add Another Publication
+                            </a>
+                            <a href="{{ url_for('view_journals') }}" class="btn btn-lg btn-outline-primary" style="border-radius: 8px; padding: 12px 40px; font-weight: bold;">
+                                <i class="bi bi-eye me-2"></i>View All Publications
+                            </a>
+                            <a href="{{ url_for('dashboard') }}" class="btn btn-lg btn-outline-secondary" style="border-radius: 8px; padding: 12px 40px; font-weight: bold;">
+                                <i class="bi bi-house me-2"></i>Go to Dashboard
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Achievements Section -->
+                <div class="card mt-4" style="border: none; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
+                    <div class="card-body p-4" style="background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);">
+                        <h5 style="color: #333; font-weight: bold; margin-bottom: 20px; text-align: center;">
+                            <i class="bi bi-trophy-fill"></i> You're on Your Way to Excellence!
+                        </h5>
+                        <div class="row text-center">
+                            <div class="col-md-4 mb-3">
+                                <div style="padding: 15px;">
+                                    <i class="bi bi-check-circle" style="font-size: 32px; color: #28a745; margin-bottom: 10px;"></i>
+                                    <h6 style="color: #666;">Publication Submitted</h6>
+                                    <p style="color: #999; font-size: 13px; margin: 0;">Successfully recorded</p>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <div style="padding: 15px;">
+                                    <i class="bi bi-star" style="font-size: 32px; color: #ffc107; margin-bottom: 10px;"></i>
+                                    <h6 style="color: #666;">Credits Earned</h6>
+                                    <p style="color: #999; font-size: 13px; margin: 0;">50 points added</p>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <div style="padding: 15px;">
+                                    <i class="bi bi-rocket-takeoff" style="font-size: 32px; color: #667eea; margin-bottom: 10px;"></i>
+                                    <h6 style="color: #666;">Keep Going</h6>
+                                    <p style="color: #999; font-size: 13px; margin: 0;">Keep climbing the ranks</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    @keyframes pulse {
+        0%, 100% {
+            transform: scale(1);
+        }
+        50% {
+            transform: scale(1.1);
+        }
+    }
+
+    .btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    }
+</style>
+{% endblock %}

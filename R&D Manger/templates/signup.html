@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up - KITE R&D Portal</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 20px;
+        }
+
+        .signup-container {
+            width: 100%;
+            max-width: 600px;
+            padding: 20px;
+        }
+
+        .card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .card-body {
+            padding: 40px;
+        }
+
+        .brand-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .brand-header i {
+            font-size: 48px;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .brand-header h2 {
+            font-weight: bold;
+            color: #333;
+            font-size: 28px;
+        }
+
+        .brand-header p {
+            color: #666;
+            font-size: 14px;
+            margin: 0;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 6px;
+            font-size: 13px;
+        }
+
+        .form-control, .form-select {
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 10px 12px;
+            font-size: 13px;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+            outline: none;
+        }
+
+        .role-selector {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .role-card {
+            position: relative;
+            cursor: pointer;
+        }
+
+        .role-card input[type="radio"] {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .role-card label {
+            display: block;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 0;
+        }
+
+        .role-card input[type="radio"]:checked + label {
+            border-color: #667eea;
+            background-color: #f0f4ff;
+            font-weight: 600;
+            color: #667eea;
+        }
+
+        .role-card label:hover {
+            border-color: #667eea;
+            background-color: #fafbfe;
+        }
+
+        .role-card i {
+            display: block;
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+        .row-two-cols {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .btn-signup {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-weight: 600;
+            font-size: 16px;
+            transition: transform 0.2s ease;
+            margin-top: 20px;
+        }
+
+        .btn-signup:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+            color: white;
+        }
+
+        .alert {
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: none;
+        }
+
+        .alert-danger {
+            background-color: #fee;
+            color: #c33;
+        }
+
+        .login-link {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .login-link a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s ease;
+        }
+
+        .login-link a:hover {
+            color: #764ba2;
+            text-decoration: underline;
+        }
+
+        .input-group-text {
+            border: 2px solid #e0e0e0;
+            background: white;
+            border-radius: 8px;
+        }
+
+        .input-group .form-control {
+            border-left: none;
+        }
+
+        .input-group .form-control:focus {
+            border-left: none;
+        }
+
+        @media (max-width: 600px) {
+            .row-two-cols {
+                grid-template-columns: 1fr;
+            }
+
+            .role-selector {
+                grid-template-columns: 1fr;
+            }
+
+            .card-body {
+                padding: 25px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="signup-container">
+        <div class="card">
+            <div class="card-body">
+                <div class="brand-header">
+                    <!-- KGISL Logo -->
+                    <img src="{{ url_for('static', filename='images/kgisl_logo.png') }}" alt="KGISL Logo" style="height: 60px; margin-bottom: 15px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));" onerror="this.style.display='none'">
+                    <h3 style="font-size: 14px; color: #666; font-weight: 400; margin-bottom: 10px;">KGISL Institute of Technology</h3>
+                    <h2>R&D Management Portal</h2>
+                    <p>Create Your Account</p>
+                </div>
+
+                {% if error %}
+                <div class="alert alert-danger" role="alert">
+                    <i class="bi bi-exclamation-circle me-2"></i> {{ error }}
+                </div>
+                {% endif %}
+
+                <form method="POST">
+                    <!-- Role Selection -->
+                    <label class="form-label fw-bold mb-3">Select Your Role <span style="color: red;">*</span></label>
+                    <div class="role-selector">
+                        <div class="role-card">
+                            <input type="radio" id="faculty" name="role" value="faculty" required>
+                            <label for="faculty">
+                                <i class="bi bi-person-badge"></i>
+                                Faculty
+                            </label>
+                        </div>
+                        <div class="role-card">
+                            <input type="radio" id="student" name="role" value="student" required>
+                            <label for="student">
+                                <i class="bi bi-mortarboard"></i>
+                                Student
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Full Name -->
+                    <div class="form-group">
+                        <label for="full_name" class="form-label">Full Name <span style="color: red;">*</span></label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-person-fill"></i></span>
+                            <input 
+                                type="text" 
+                                class="form-control" 
+                                id="full_name" 
+                                name="full_name" 
+                                placeholder="Enter your full name"
+                                required
+                            >
+                        </div>
+                    </div>
+
+                    <!-- Username and Email in Two Columns -->
+                    <div class="row-two-cols">
+                        <div class="form-group">
+                            <label for="username" class="form-label">Username <span style="color: red;">*</span></label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-at"></i></span>
+                                <input 
+                                    type="text" 
+                                    class="form-control" 
+                                    id="username" 
+                                    name="username" 
+                                    placeholder="Choose username"
+                                    required
+                                >
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="email" class="form-label">Email <span style="color: red;">*</span></label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-envelope-fill"></i></span>
+                                <input 
+                                    type="email" 
+                                    class="form-control" 
+                                    id="email" 
+                                    name="email" 
+                                    placeholder="your@email.com"
+                                    required
+                                >
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Department and Designation -->
+                    <div class="row-two-cols">
+                        <div class="form-group">
+                            <label for="department" class="form-label">Department</label>
+                            <input 
+                                type="text" 
+                                class="form-control" 
+                                id="department" 
+                                name="department" 
+                                placeholder="e.g., Computer Science"
+                            >
+                        </div>
+                        <div class="form-group">
+                            <label for="designation" class="form-label">Designation/Year</label>
+                            <input 
+                                type="text" 
+                                class="form-control" 
+                                id="designation" 
+                                name="designation" 
+                                placeholder="e.g., Associate Professor / 2nd Year"
+                            >
+                        </div>
+                    </div>
+
+                    <!-- Password Fields -->
+                    <div class="row-two-cols">
+                        <div class="form-group">
+                            <label for="password" class="form-label">Password <span style="color: red;">*</span></label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-lock-fill"></i></span>
+                                <input 
+                                    type="password" 
+                                    class="form-control" 
+                                    id="password" 
+                                    name="password" 
+                                    placeholder="Min. 8 characters"
+                                    required
+                                    minlength="8"
+                                >
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="confirm_password" class="form-label">Confirm Password <span style="color: red;">*</span></label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-lock-fill"></i></span>
+                                <input 
+                                    type="password" 
+                                    class="form-control" 
+                                    id="confirm_password" 
+                                    name="confirm_password" 
+                                    placeholder="Confirm password"
+                                    required
+                                    minlength="8"
+                                >
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-signup">
+                        <i class="bi bi-check-circle me-2"></i> Create Account
+                    </button>
+                </form>
+
+                <div class="login-link">
+                    Already have an account? <a href="{{ url_for('login') }}">Sign In Here</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer Info -->
+        <div style="text-align: center; color: white; margin-top: 30px; font-size: 13px;">
+            <p style="margin: 0;"><i class="bi bi-info-circle me-1"></i> Your information is secure and encrypted</p>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

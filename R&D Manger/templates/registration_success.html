@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome - KITE R&D Portal</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .welcome-container {
+            width: 100%;
+            max-width: 600px;
+            padding: 20px;
+        }
+
+        .card {
+            border: none;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: slideUp 0.6s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .success-header {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            padding: 50px 20px;
+            text-align: center;
+            color: white;
+        }
+
+        .success-header i {
+            font-size: 80px;
+            margin-bottom: 20px;
+            display: block;
+            animation: bounce 1s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-20px);
+            }
+        }
+
+        .success-header h1 {
+            font-weight: bold;
+            font-size: 42px;
+            margin-bottom: 10px;
+        }
+
+        .success-header p {
+            font-size: 18px;
+            margin: 0;
+            opacity: 0.9;
+        }
+
+        .role-badge {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 14px;
+            margin: 10px 0;
+        }
+
+        .role-faculty {
+            background-color: #e7f3ff;
+            color: #667eea;
+        }
+
+        .role-student {
+            background-color: #e8f5e9;
+            color: #28a745;
+        }
+
+        .role-admin {
+            background-color: #fff3cd;
+            color: #ff6b6b;
+        }
+
+        .btn-custom {
+            border-radius: 8px;
+            padding: 12px 30px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .btn-custom:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .info-card {
+            border-left: 4px solid #667eea;
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .feature-box {
+            text-align: center;
+            padding: 20px;
+            margin: 10px 0;
+        }
+
+        .feature-box i {
+            font-size: 40px;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .quote-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 10px;
+            text-align: center;
+            margin: 20px 0;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="welcome-container">
+        <div class="card">
+            <!-- Success Header -->
+            <div class="success-header">
+                <!-- KGISL Logo -->
+                <img src="{{ url_for('static', filename='images/kgisl_logo.png') }}" alt="KGISL Logo" style="height: 70px; margin-bottom: 20px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));" onerror="this.style.display='none'">
+                <h3 style="font-size: 16px; font-weight: 400; margin-bottom: 15px;">KGISL Institute of Technology</h3>
+                <i class="bi bi-check-circle-fill"></i>
+                <h1>Welcome to R&D Portal!</h1>
+                <p>Your account has been successfully created</p>
+            </div>
+
+            <!-- Content -->
+            <div class="card-body p-5">
+                <!-- User Information -->
+                <div style="text-align: center; margin-bottom: 30px;">
+                    <h4 style="color: #333; margin-bottom: 10px;">
+                        <strong>{{ full_name }}</strong>
+                    </h4>
+                    <div>
+                        <span class="role-badge" {% if role == 'faculty' %}style="background-color: #e7f3ff; color: #667eea;"{% elif role == 'student' %}style="background-color: #e8f5e9; color: #28a745;"{% else %}style="background-color: #fff3cd; color: #ff6b6b;"{% endif %}>
+                            <i class="bi bi-person-fill me-1"></i>{{ role.upper() }}
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Motivational Message -->
+                <div class="alert alert-success" style="border-radius: 10px; border: 2px solid #28a745;">
+                    <div style="text-align: center;">
+                        <i class="bi bi-lightning-fill" style="font-size: 24px; color: #28a745;"></i>
+                        <h5 style="color: #155724; margin-top: 10px; margin-bottom: 10px; font-weight: bold;">🚀 Your Race Has Been Started!</h5>
+                        <p style="color: #155724; margin: 0; font-size: 15px;">
+                            <strong>Keep doing great work! 🎯 Together, we'll reach new heights in research excellence!</strong>
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Inspirational Quote -->
+                {% if motivational_quote %}
+                <div class="quote-box">
+                    <i class="bi bi-quote" style="font-size: 24px;"></i>
+                    <p style="margin-top: 15px; margin-bottom: 0;">
+                        {{ motivational_quote }}
+                    </p>
+                </div>
+                {% endif %}
+
+                <!-- Information Cards -->
+                <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; margin: 25px 0;">
+                    <h6 style="color: #333; font-weight: bold; margin-bottom: 20px;">
+                        <i class="bi bi-info-circle me-2"></i>What You Can Do Now:
+                    </h6>
+
+                    <div class="feature-box" style="border-left: 3px solid #667eea; text-align: left;">
+                        <i class="bi bi-plus-circle" style="color: #667eea; margin-bottom: 8px; font-size: 30px;"></i>
+                        <h6 style="color: #333; font-weight: bold;">Add Publications</h6>
+                        <p style="color: #666; margin: 0; font-size: 14px;">Submit your research publications and earn credits for each submission.</p>
+                    </div>
+
+                    <div class="feature-box" style="border-left: 3px solid #28a745; text-align: left;">
+                        <i class="bi bi-star-fill" style="color: #28a745; margin-bottom: 8px; font-size: 30px;"></i>
+                        <h6 style="color: #333; font-weight: bold;">Earn Rewards</h6>
+                        <p style="color: #666; margin: 0; font-size: 14px;">Gain 50 credits for each publication. Track your progress on the dashboard.</p>
+                    </div>
+
+                    <div class="feature-box" style="border-left: 3px solid #764ba2; text-align: left;">
+                        <i class="bi bi-trophy-fill" style="color: #764ba2; margin-bottom: 8px; font-size: 30px;"></i>
+                        <h6 style="color: #333; font-weight: bold;">Climb the Rankings</h6>
+                        <p style="color: #666; margin: 0; font-size: 14px;">Compete with peers and become a top performer in your institution.</p>
+                    </div>
+
+                    <div class="feature-box" style="border-left: 3px solid #ffc107; text-align: left;">
+                        <i class="bi bi-compass" style="color: #ffc107; margin-bottom: 8px; font-size: 30px;"></i>
+                        <h6 style="color: #333; font-weight: bold;">Learn Our Mission</h6>
+                        <p style="color: #666; margin: 0; font-size: 14px;">Explore our vision and mission to understand our commitment to excellence.</p>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-top: 30px;">
+                    <a href="{{ url_for('login') }}" class="btn btn-lg btn-custom" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none;">
+                        <i class="bi bi-box-arrow-in-right me-2"></i>Sign In Now
+                    </a>
+                    <a href="{{ url_for('vision_mission') }}" class="btn btn-lg btn-custom btn-outline-primary">
+                        <i class="bi bi-compass me-2"></i>Vision & Mission
+                    </a>
+                </div>
+
+                <!-- Footer Note -->
+                <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #e0e0e0;">
+                    <p style="color: #666; font-size: 14px; margin: 0;">
+                        <i class="bi bi-info-circle me-2"></i>Your credentials have been securely stored. Sign in with your username and password to access your dashboard.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div style="text-align: center; color: white; margin-top: 30px; font-size: 13px;">
+            <p style="margin: 0;"><i class="bi bi-shield-check me-1"></i> Secure | <i class="bi bi-lock-fill me-1"></i> Private | <i class="bi bi-check-circle-fill me-1"></i> Verified</p>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

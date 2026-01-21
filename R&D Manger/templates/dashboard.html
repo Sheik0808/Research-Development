@@ -1,0 +1,298 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container-fluid dashboard-container">
+
+    <!-- Welcome Message on First Visit -->
+    {% if is_first_visit %}
+    <div class="alert alert-success alert-dismissible fade show mb-4" role="alert" style="border-radius: 10px; border: 2px solid #28a745;">
+        <div style="text-align: center;">
+            <i class="bi bi-star-fill" style="font-size: 24px; color: #28a745;"></i>
+            <h4 class="mb-2 mt-2" style="color: #155724;">Welcome to Your R&D Journey!</h4>
+            <p class="mb-0" style="color: #155724; font-size: 15px;">
+                <strong>🚀 Your race has been started... Keep doing great work! 🎯</strong><br>
+                Start adding your research publications and earn credits for each one. You're on your way to becoming a top performer!
+            </p>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endif %}
+
+    <!-- Motivational Quote Section -->
+    {% if motivational_quote %}
+    <div class="alert alert-info alert-dismissible fade show mb-4" role="alert" style="border-radius: 10px; border: 2px solid #667eea;">
+        <div style="text-align: center;">
+            <i class="bi bi-quote" style="font-size: 24px; color: #667eea;"></i>
+            <p class="mb-0 mt-2" style="font-style: italic; font-size: 16px; color: #333;">
+                {{ motivational_quote }}
+            </p>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endif %}
+
+    <!-- Header with Logo and Background -->
+    <div class="header-section mb-5">
+        <div class="header-background">
+            <svg class="header-decoration" viewBox="0 0 1200 300" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <linearGradient id="headerGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#667eea;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#764ba2;stop-opacity:1" />
+                    </linearGradient>
+                </defs>
+                <rect width="1200" height="300" fill="url(#headerGrad)"/>
+                <circle cx="100" cy="50" r="80" fill="rgba(255,255,255,0.1)"/>
+                <circle cx="1100" cy="250" r="120" fill="rgba(255,255,255,0.1)"/>
+                <path d="M0 200 Q300 150 600 200 T1200 200 L1200 300 L0 300 Z" fill="rgba(255,255,255,0.05)"/>
+            </svg>
+        </div>
+        <div class="header-content text-center text-white">
+            <div class="logo-section mb-3">
+                <div class="logo-circle">
+                    <i class="bi bi-flask-fill" style="font-size: 3rem;"></i>
+                </div>
+            </div>
+            <h1 class="display-4 fw-bold mb-2">R&D Management System</h1>
+            <p class="fs-5 mb-0">KITE Research & Development Portal</p>
+            <p class="small mt-2 opacity-75">Manage and Track Journal Publications, Research Reports & Analytics</p>
+        </div>
+    </div>
+
+    <!-- Credits & Achievements Section -->
+    {% if user_credits is defined %}
+    <div class="row g-4 mb-5">
+        <div class="col-md-12">
+            <div class="card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; border-radius: 12px; color: white;">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5 class="card-title mb-2">
+                                <i class="bi bi-trophy-fill"></i> Your Achievements
+                            </h5>
+                            <p class="mb-0">Keep contributing to earn more credits and rewards!</p>
+                        </div>
+                        <div style="text-align: right;">
+                            <h2 style="font-size: 48px; font-weight: bold; margin: 0;">{{ user_credits }}</h2>
+                            <p style="margin: 0; font-size: 14px;">Total Credits</p>
+                        </div>
+                    </div>
+                    <div class="progress mt-3" style="background-color: rgba(255,255,255,0.2);">
+                        <div class="progress-bar" role="progressbar" style="width: {{ (user_credits % 200) * 50 / 200 }}%; background-color: #FFD700;" aria-valuenow="{{ (user_credits % 200) * 50 / 200 }}" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                    <p class="small mt-2 mb-0">🎁 Earn 50 credits for each publication added</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Dashboard Cards -->
+    <div class="row g-4 mb-5">
+
+        <!-- Journal Publications Card -->
+        <div class="col-md-6 col-lg-5">
+            <div class="dashboard-card card-journal h-100">
+                <div class="card-icon-section">
+                    <div class="icon-wrapper journal-icon">
+                        <i class="bi bi-journal-bookmark"></i>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title fw-bold mb-3">Journal Publications</h5>
+                    <div class="stat-display">
+                        <h2 class="stat-number">{{ total_journals }}</h2>
+                        <p class="stat-label">Papers Indexed</p>
+                    </div>
+                    <p class="card-description mt-3">Track and manage all your published journal articles and research papers.</p>
+                </div>
+                <div class="card-footer-custom">
+                    <a href="/add_journal" class="btn btn-gradient-primary btn-sm me-2">
+                        <i class="bi bi-plus-circle"></i> Add Publication
+                    </a>
+                    <a href="/view_journals" class="btn btn-outline-primary btn-sm">
+                        <i class="bi bi-eye"></i> View All
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Reports Card -->
+        <div class="col-md-6 col-lg-5">
+            <div class="dashboard-card card-reports h-100">
+                <div class="card-icon-section">
+                    <div class="icon-wrapper reports-icon">
+                        <i class="bi bi-bar-chart-line"></i>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title fw-bold mb-3">Analytics & Reports</h5>
+                    <div class="stat-display">
+                        <h2 class="stat-number">{{ total_reports }}</h2>
+                        <p class="stat-label">Generated Reports</p>
+                    </div>
+                    <p class="card-description mt-3">View detailed analytics, statistics, and comprehensive research reports.</p>
+                </div>
+                <div class="card-footer-custom">
+                    <a href="/view_journals" class="btn btn-gradient-success btn-sm">
+                        <i class="bi bi-graph-up"></i> View Details
+                    </a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Features Section -->
+    <div class="features-section mt-5 pt-5">
+        <h3 class="section-title text-center mb-4 fw-bold">Key Features</h3>
+        <div class="row g-3">
+            <div class="col-md-4 col-sm-6">
+                <div class="feature-box">
+                    <div class="feature-icon">
+                        <i class="bi bi-clipboard-check"></i>
+                    </div>
+                    <h6 class="feature-title">Easy Management</h6>
+                    <p class="feature-text">Organize and manage all your research publications with ease</p>
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-6">
+                <div class="feature-box">
+                    <div class="feature-icon">
+                        <i class="bi bi-graph-up-arrow"></i>
+                    </div>
+                    <h6 class="feature-title">Analytics</h6>
+                    <p class="feature-text">Track publication metrics and research impact</p>
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-6">
+                <div class="feature-box">
+                    <div class="feature-icon">
+                        <i class="bi bi-shield-check"></i>
+                    </div>
+                    <h6 class="feature-title">Secure Data</h6>
+                    <p class="feature-text">Your research data is secure and well-organized</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Professor Publications Section -->
+    <div class="professor-section mt-5 pt-5">
+        <div class="row">
+            <!-- Top Publishers -->
+            <div class="col-lg-6 mb-4">
+                <div class="stats-card">
+                    <div class="stats-header">
+                        <h5 class="fw-bold mb-0">
+                            <i class="bi bi-person-workspace"></i> Top Publishers
+                        </h5>
+                        <span class="badge bg-gradient">Top 10</span>
+                    </div>
+                    <div class="stats-content">
+                        {% if professor_stats %}
+                            <div class="professor-list">
+                                {% for prof in professor_stats %}
+                                    <div class="professor-item">
+                                        <div class="professor-info">
+                                            <div class="professor-name">{{ prof['author_name'] }}</div>
+                                            <div class="professor-progress">
+                                                <div class="progress-bar-custom">
+                                                    <div class="progress-fill" style="width: {% if professor_stats|length > 0 %}{{ (prof['paper_count'] / professor_stats[0]['paper_count'] * 100) }}{% endif %}%"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="paper-count">
+                                            <span class="count-badge">{{ prof['paper_count'] }}</span>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <p class="text-muted text-center py-4">No professor data available</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Department Statistics -->
+            <div class="col-lg-6 mb-4">
+                <div class="stats-card">
+                    <div class="stats-header">
+                        <h5 class="fw-bold mb-0">
+                            <i class="bi bi-building"></i> Publications by Department
+                        </h5>
+                        <span class="badge bg-gradient">Departments</span>
+                    </div>
+                    <div class="stats-content">
+                        {% if dept_stats %}
+                            <div class="department-list">
+                                {% for dept in dept_stats %}
+                                    <div class="department-item">
+                                        <div class="dept-info">
+                                            <div class="dept-name">{{ dept['department'] }}</div>
+                                        </div>
+                                        <div class="dept-stat">
+                                            <span class="stat-value">{{ dept['paper_count'] }}</span>
+                                            <span class="stat-label">papers</span>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <p class="text-muted text-center py-4">No department data available</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Indexing Statistics -->
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="stats-card">
+                    <div class="stats-header">
+                        <h5 class="fw-bold mb-0">
+                            <i class="bi bi-bar-chart-fill"></i> Publication Indexing Statistics
+                        </h5>
+                    </div>
+                    <div class="stats-content">
+                        <div class="indexing-stats-grid">
+                            <div class="indexing-box scopus-box">
+                                <div class="indexing-icon">
+                                    <i class="bi bi-database-fill"></i>
+                                </div>
+                                <div class="indexing-info">
+                                    <h6 class="indexing-label">Scopus</h6>
+                                    <div class="indexing-number">{{ indexing_stats.scopus }}</div>
+                                    <small class="indexing-pct">{% if total_journals > 0 %}{{ "%.1f"|format((indexing_stats.scopus / total_journals * 100)) }}%{% else %}0%{% endif %}</small>
+                                </div>
+                            </div>
+                            <div class="indexing-box sci-box">
+                                <div class="indexing-icon">
+                                    <i class="bi bi-file-earmark-text"></i>
+                                </div>
+                                <div class="indexing-info">
+                                    <h6 class="indexing-label">SCI/SCIE/SSCI</h6>
+                                    <div class="indexing-number">{{ indexing_stats.sci }}</div>
+                                    <small class="indexing-pct">{% if total_journals > 0 %}{{ "%.1f"|format((indexing_stats.sci / total_journals * 100)) }}%{% else %}0%{% endif %}</small>
+                                </div>
+                            </div>
+                            <div class="indexing-box wos-box">
+                                <div class="indexing-icon">
+                                    <i class="bi bi-globe-americas"></i>
+                                </div>
+                                <div class="indexing-info">
+                                    <h6 class="indexing-label">Web of Science</h6>
+                                    <div class="indexing-number">{{ indexing_stats.wos }}</div>
+                                    <small class="indexing-pct">{% if total_journals > 0 %}{{ "%.1f"|format((indexing_stats.wos / total_journals * 100)) }}%{% else %}0%{% endif %}</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

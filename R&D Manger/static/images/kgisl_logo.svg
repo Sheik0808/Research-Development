@@ -1,0 +1,37 @@
+<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="200" height="200" fill="#667eea" rx="20"/>
+  
+  <!-- Outer Circle -->
+  <circle cx="100" cy="100" r="95" fill="none" stroke="white" stroke-width="3"/>
+  
+  <!-- Inner Circle -->
+  <circle cx="100" cy="100" r="85" fill="none" stroke="white" stroke-width="2" stroke-dasharray="5,5" opacity="0.6"/>
+  
+  <!-- Central Icon - Flask/Lab -->
+  <g transform="translate(100, 100)">
+    <!-- Flask body -->
+    <path d="M -20 -10 L -15 20 Q -15 30 -5 30 L 5 30 Q 15 30 15 20 L 20 -10 Z" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+    
+    <!-- Flask cap -->
+    <rect x="-12" y="-18" width="24" height="8" fill="white" stroke="white" stroke-width="2" rx="2"/>
+    
+    <!-- Liquid inside flask -->
+    <path d="M -15 15 Q -15 25 -5 25 L 5 25 Q 15 25 15 15 L 15 10 Q 15 8 13 8 L -13 8 Q -15 8 -15 10 Z" fill="rgba(255,255,255,0.3)"/>
+    
+    <!-- Molecules/Atoms around flask -->
+    <circle cx="-35" cy="-15" r="3" fill="white" opacity="0.8"/>
+    <circle cx="35" cy="-15" r="3" fill="white" opacity="0.8"/>
+    <circle cx="-30" cy="25" r="2.5" fill="white" opacity="0.6"/>
+    <circle cx="30" cy="25" r="2.5" fill="white" opacity="0.6"/>
+    
+    <!-- Connecting lines -->
+    <line x1="-35" y1="-15" x2="-20" y2="-5" stroke="white" stroke-width="1.5" opacity="0.5" stroke-dasharray="2,2"/>
+    <line x1="35" y1="-15" x2="20" y2="-5" stroke="white" stroke-width="1.5" opacity="0.5" stroke-dasharray="2,2"/>
+  </g>
+  
+  <!-- Text -->
+  <text x="100" y="175" font-family="Arial, sans-serif" font-size="10" fill="white" text-anchor="middle" font-weight="bold" opacity="0.8">
+    KGISL
+  </text>
+</svg>
