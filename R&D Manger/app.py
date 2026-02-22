@@ -1,7 +1,10 @@
 import os
 import sqlite3
 import random
-from flask import Flask, render_template, request, redirect, url_for, session
+import requests
+import re
+from flask import Flask, render_template, request, redirect, url_for, session, jsonify
+import pandas as pd
 from werkzeug.utils import secure_filename
 from werkzeug.security import generate_password_hash, check_password_hash
 from functools import wraps
@@ -353,6 +356,192 @@ def admin_dashboard():
                          motivational_quote=motivational_quote,
                          is_first_visit=is_first_visit)
 
+# ---------------- FETCH DOI DATA ----------------
+@app.route('/fetch_doi', methods=['POST'])
+@login_required
+def fetch_doi():
+    """Fetch publication details from DOI using CrossRef API"""
+    try:
+        doi_input = request.json.get('doi', '').strip()
+        
+        if not doi_input:
+            return jsonify({'success': False, 'error': 'DOI is required'}), 400
+        
+        # Extract DOI from URL if full URL is provided
+        doi = doi_input
+        if 'doi.org/' in doi_input:
+            doi = doi_input.split('doi.org/')[-1]
+        
+        # Clean up DOI
+        doi = doi.strip('/')
+        
+        # Fetch from CrossRef API
+        api_url = f'https://api.crossref.org/works/{doi}'
+        response = requests.get(api_url, timeout=10)
+        
+        if response.status_code != 200:
+            return jsonify({'success': False, 'error': 'DOI not found or invalid'}), 404
+        
+        data = response.json()['message']
+        
+        # Extract relevant information
+        paper_data = {
+            'success': True,
+            'paper_title': data.get('title', [''])[0] if data.get('title') else '',
+            'journal_name': data.get('container-title', [''])[0] if data.get('container-title') else '',
+            'publisher': data.get('publisher', ''),
+            'doi_link': f"https://doi.org/{doi}",
+            'issn_number': data.get('ISSN', [''])[0] if data.get('ISSN') else '',
+            'authors': [],
+            'year': '',
+            'month': '',
+            'volume': data.get('volume', ''),
+            'issue': data.get('issue', ''),
+            'page': data.get('page', ''),
+            'type': data.get('type', ''),
+            'indexing': '',
+            'journal_scope': 'International',  # Most DOI-registered journals are international
+        }
+        
+        # Extract publication date
+        if 'published-print' in data:
+            date_parts = data['published-print'].get('date-parts', [[]])[0]
+        elif 'published-online' in data:
+            date_parts = data['published-online'].get('date-parts', [[]])[0]
+        else:
+            date_parts = []
+        
+        if date_parts:
+            if len(date_parts) >= 1:
+                paper_data['year'] = str(date_parts[0])
+            if len(date_parts) >= 2:
+                month_names = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 
+                             'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+                paper_data['month'] = month_names[date_parts[1] - 1] if date_parts[1] <= 12 else ''
+        
+        # Format month_year
+        if paper_data['month'] and paper_data['year']:
+            paper_data['month_year'] = f"{paper_data['month']} {paper_data['year']}"
+        elif paper_data['year']:
+            paper_data['month_year'] = paper_data['year']
+        else:
+            paper_data['month_year'] = ''
+        
+        # Extract authors with position information
+        author_list = []
+        corresponding_author_idx = -1
+        
+        if 'author' in data:
+            for idx, author in enumerate(data['author']):
+                given = author.get('given', '')
+                family = author.get('family', '')
+                full_name = f"{given} {family}".strip()
+                
+                if full_name:
+                    author_info = {
+                        'name': full_name,
+                        'sequence': author.get('sequence', 'additional'),  # 'first' or 'additional'
+                        'is_corresponding': False
+                    }
+                    
+                    # Check for corresponding author indicators
+                    # Some CrossRef records have affiliation or specific markers
+                    if 'affiliation' in author:
+                        for affil in author['affiliation']:
+                            affil_name = affil.get('name', '').lower()
+                            if 'corresponding' in affil_name or 'contact' in affil_name:
+                                author_info['is_corresponding'] = True
+                                corresponding_author_idx = idx
+                    
+                    author_list.append(author_info)
+                    paper_data['authors'].append(full_name)
+        
+        # Determine author position for the first listed author
+        paper_data['author_position'] = 'First Author'  # Default
+        
+        if author_list:
+            first_author_info = author_list[0]
+            
+            # Check if first author is also corresponding author
+            if first_author_info.get('is_corresponding'):
+                paper_data['author_position'] = 'Corresponding Author'
+            elif first_author_info.get('sequence') == 'first':
+                paper_data['author_position'] = 'First Author'
+            else:
+                paper_data['author_position'] = 'Co-Author'
+        
+        # Format author names
+        if paper_data['authors']:
+            paper_data['author_name'] = paper_data['authors'][0]  # First author
+            if len(paper_data['authors']) > 1:
+                paper_data['collaborative_authors'] = ', '.join(paper_data['authors'][1:])
+            else:
+                paper_data['collaborative_authors'] = ''
+            
+            # Add all authors list for reference
+            paper_data['all_authors'] = paper_data['authors']
+            paper_data['total_authors'] = len(paper_data['authors'])
+        
+        # Format vol/issue/page
+        vol_issue_page_parts = []
+        if paper_data['volume']:
+            vol_issue_page_parts.append(f"Vol.{paper_data['volume']}")
+        if paper_data['issue']:
+            vol_issue_page_parts.append(f"Issue.{paper_data['issue']}")
+        if paper_data['page']:
+            vol_issue_page_parts.append(f"pp.{paper_data['page']}")
+        paper_data['vol_issue_page'] = ', '.join(vol_issue_page_parts)
+        
+        # Intelligent indexing detection based on publisher and journal metadata
+        publisher_lower = paper_data['publisher'].lower()
+        journal_lower = paper_data['journal_name'].lower()
+        
+        # Major publishers typically indexed in Scopus and Web of Science
+        scopus_wos_publishers = [
+            'springer', 'elsevier', 'wiley', 'ieee', 'nature', 'oxford', 
+            'cambridge', 'taylor', 'sage', 'emerald', 'frontiers',
+            'mdpi', 'hindawi', 'plos', 'bmc', 'acm', 'aaas'
+        ]
+        
+        # SCI/SCIE/SSCI indicators (high-impact publishers)
+        sci_publishers = [
+            'nature', 'science', 'cell', 'lancet', 'nejm', 'jama',
+            'springer', 'elsevier', 'wiley', 'oxford', 'cambridge'
+        ]
+        
+        # Check publisher reputation
+        is_major_publisher = any(pub in publisher_lower for pub in scopus_wos_publishers)
+        is_high_impact = any(pub in publisher_lower for pub in sci_publishers)
+        
+        # Detect likely indexing (prioritize in order: WoS > Scopus > SCI)
+        if is_high_impact:
+            # High-impact publishers are often in WoS and SCI
+            if 'nature' in publisher_lower or 'science' in journal_lower:
+                paper_data['indexing'] = 'SCI/SCIE/SSCI'
+            elif any(pub in publisher_lower for pub in ['ieee', 'acm', 'springer']):
+                paper_data['indexing'] = 'WoS'
+            else:
+                paper_data['indexing'] = 'Scopus'
+        elif is_major_publisher:
+            paper_data['indexing'] = 'Scopus'
+        else:
+            paper_data['indexing'] = ''  # Unknown, user should verify
+        
+        # Add indexing confidence note
+        if paper_data['indexing']:
+            paper_data['indexing_note'] = f"Likely indexed (based on publisher: {paper_data['publisher']}). Please verify."
+        else:
+            paper_data['indexing_note'] = 'Indexing unclear. Please verify manually.'
+        
+        return jsonify(paper_data)
+        
+    except requests.exceptions.Timeout:
+        return jsonify({'success': False, 'error': 'Request timeout. Please try again.'}), 408
+    except requests.exceptions.RequestException as e:
+        return jsonify({'success': False, 'error': f'Network error: {str(e)}'}), 500
+    except Exception as e:
+        return jsonify({'success': False, 'error': f'Error fetching DOI data: {str(e)}'}), 500
+
 # ---------------- ADD JOURNAL ----------------
 @app.route('/add_journal', methods=['GET', 'POST'])
 @login_required
@@ -392,6 +581,9 @@ def add_journal():
             request.form.get('collab_scope'),
             request.form.get('collab_institution'),
 
+            request.form.get('publication_type', 'Journal'),
+            request.form.get('status', 'Published'),
+
             ""  # proof filename placeholder
         )
 
@@ -414,9 +606,10 @@ def add_journal():
                 impact_factor, citation_score, sjr_rating, h_index, anna_univ_list,
                 preview_link, home_page_link, doi_link,
                 collab_scope, collab_institution,
+                publication_type, status,
                 proof_filename
             )
-            VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+            VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
         """, data)
 
         conn.commit()
@@ -462,6 +655,201 @@ def view_journals():
     journals = conn.execute('SELECT * FROM journals').fetchall()
     conn.close()
     return render_template('view_journals.html', journals=journals)
+
+# ---------------- EXCEL DASHBOARD ----------------
+@app.route('/excel_dashboard')
+@login_required
+def excel_dashboard():
+    conn = get_db_connection()
+    
+    # Get filter parameters
+    dept_filter = request.args.get('dept', '')
+    type_filter = request.args.get('type', '')
+    status_filter = request.args.get('status', '')
+    author_filter = request.args.get('author', '')
+    title_filter = request.args.get('title', '')
+    
+    query = 'SELECT * FROM journals WHERE 1=1'
+    params = []
+    
+    if dept_filter:
+        query += ' AND department = ?'
+        params.append(dept_filter)
+    if type_filter:
+        query += ' AND publication_type = ?'
+        params.append(type_filter)
+    if status_filter:
+        query += ' AND status = ?'
+        params.append(status_filter)
+    if author_filter:
+        query += ' AND author_name LIKE ?'
+        params.append(f'%{author_filter}%')
+    if title_filter:
+        query += ' AND paper_title LIKE ?'
+        params.append(f'%{title_filter}%')
+        
+    query += ' ORDER BY department ASC, paper_title ASC'
+    journals = conn.execute(query, params).fetchall()
+    
+    # Summary statistics based on filtered results
+    stats = {
+        'total': len(journals),
+        'journals': len([j for j in journals if j['publication_type'] == 'Journal']),
+        'papers': len([j for j in journals if j['publication_type'] == 'Paper']),
+        'books': len([j for j in journals if j['publication_type'] == 'Book']),
+        'published': len([j for j in journals if j['status'] == 'Published']),
+        'accepted': len([j for j in journals if j['status'] == 'Accepted']),
+        'submitted': len([j for j in journals if j['status'] == 'Submitted']),
+        'rejected': len([j for j in journals if j['status'] == 'Rejected']),
+        'working': len([j for j in journals if j['status'] == 'Working Process'])
+    }
+
+    # Department-wise statistics
+    unique_depts = sorted(list(set([j['department'] for j in journals if j['department']])))
+    dept_stats = {d: len([j for j in journals if j['department'] == d]) for d in unique_depts}
+    
+    # Get unique departments for filter dropdown (sorted A-Z)
+    depts = conn.execute("SELECT DISTINCT department FROM journals WHERE department IS NOT NULL AND department != '' ORDER BY department ASC").fetchall()
+    
+    conn.close()
+    
+    return render_template('excel_dashboard.html', 
+                          journals=journals, 
+                          stats=stats, 
+                          depts=depts,
+                          dept_stats=dept_stats,
+                          current_filters={'dept': dept_filter, 'type': type_filter, 'status': status_filter, 'author': author_filter, 'title': title_filter})
+
+@app.route('/upload_excel', methods=['POST'])
+@login_required
+def upload_excel():
+    if 'excel_file' not in request.files:
+        return jsonify({'success': False, 'error': 'No file part'}), 400
+    
+    file = request.files['excel_file']
+    if file.filename == '':
+        return jsonify({'success': False, 'error': 'No selected file'}), 400
+        
+    if file and file.filename.endswith(('.xlsx', '.xls')):
+        filename = secure_filename(file.filename)
+        file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        file.save(file_path)
+        
+        try:
+            df = pd.read_excel(file_path)
+            if df.empty:
+                return jsonify({'success': False, 'error': 'The Excel file is empty'}), 400
+            
+            # Normalize column names: trim and lowercase
+            df.columns = [str(c).strip().lower() for c in df.columns]
+            
+            conn = get_db_connection()
+            count = 0
+            for _, row in df.iterrows():
+                # IMPROVED FUZZY MATCHER
+                def get_val(df_row, primary_headers, keywords=None, default=None):
+                    # 1. Try exact/primary matches
+                    for h in primary_headers:
+                        h_norm = str(h).strip().lower()
+                        if h_norm in df_row.index:
+                            val = df_row[h_norm]
+                            if not pd.isna(val) and val is not None:
+                                return str(val).strip() if isinstance(val, str) else val
+                    
+                    # 2. Try fuzzy keyword matches if enabled
+                    if keywords:
+                        for col in df_row.index:
+                            for kw in keywords:
+                                if str(kw).lower() in str(col).lower():
+                                    val = df_row[col]
+                                    if not pd.isna(val) and val is not None:
+                                        return str(val).strip() if isinstance(val, str) else val
+                    
+                    return default
+
+                data = (
+                    get_val(row, ['Journal Status'], ['status'], 'Published'),
+                    get_val(row, ['Department', 'Department Name', 'Dept', 'Branch', 'Dept.'], ['dept', 'department', 'branch']),
+                    get_val(row, ['Author Position'], ['position']),
+                    get_val(row, ['Author Name'], ['author', 'name', 'faculty']),
+                    get_val(row, ['Collaborative Authors'], ['collaborator', 'co-author'], ''),
+                    get_val(row, ['Paper Title', 'Title of Paper', 'Title'], ['title', 'paper', 'article', 'top']),
+                    get_val(row, ['Publisher'], ['publisher', 'press'], ''),
+                    get_val(row, ['Journal Name'], ['journal', 'publication'], ''),
+                    get_val(row, ['Journal Scope'], ['scope', 'field'], ''),
+                    get_val(row, ['Vol/Issue/Page'], ['volume', 'issue', 'page'], ''),
+                    get_val(row, ['Month/Year'], ['month', 'year', 'date'], ''),
+                    get_val(row, ['ISSN'], ['issn'], ''),
+                    get_val(row, ['Scopus'], ['scopus'], 0),
+                    get_val(row, ['SCI'], ['sci'], 0),
+                    get_val(row, ['WoS'], ['wos'], 0),
+                    get_val(row, ['Publication Type'], ['type', 'category', 'kind'], 'Journal'),
+                    get_val(row, ['Status', 'Publication Status', 'Working Status', 'Paper Status'], ['working', 'progress', 'status'], 'Published')
+                )
+                
+                # Check for essential data - skip if all important fields are missing
+                if not any([data[1], data[3], data[5], data[7]]): # Dept, Author, Title, Journal Name
+                    continue
+
+                conn.execute("""
+                    INSERT INTO journals (
+                        journal_status, department, author_position, author_name, collaborative_authors,
+                        paper_title, publisher, journal_name, journal_scope, vol_issue_page,
+                        month_year, issn_number, is_scopus, is_sci_scie_ssci, is_wos,
+                        publication_type, status
+                    )
+                    VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+                """, data)
+                count += 1
+            
+            conn.commit()
+            conn.close()
+            
+            # Identify departments found for feedback
+            dept_cols = [c for c in df.columns if any(kw in str(c).lower() for kw in ['dept', 'department', 'branch'])]
+            depts_found = df[dept_cols[0]].dropna().unique().tolist() if not df.empty and dept_cols else []
+            dept_msg = f" (Departments: {', '.join(map(str, depts_found))})" if depts_found else ""
+            
+            os.remove(file_path)
+            return jsonify({'success': True, 'message': f'Successfully uploaded {count} records!{dept_msg}'})
+            
+        except Exception as e:
+            if os.path.exists(file_path):
+                os.remove(file_path)
+            return jsonify({'success': False, 'error': f'Error processing Excel: {str(e)}'}), 500
+    
+    return jsonify({'success': False, 'error': 'Invalid file format. Please upload .xlsx or .xls'}), 400
+
+@app.route('/delete_journal/<int:id>', methods=['POST'])
+@login_required
+def delete_journal(id):
+    try:
+        conn = get_db_connection()
+        conn.execute('DELETE FROM journals WHERE id = ?', (id,))
+        conn.commit()
+        conn.close()
+        return jsonify({'success': True, 'message': 'Record deleted successfully'})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/delete_journals_batch', methods=['POST'])
+@login_required
+def delete_journals_batch():
+    try:
+        data = request.get_json()
+        ids = data.get('ids', [])
+        if not ids:
+            return jsonify({'success': False, 'error': 'No records selected'}), 400
+        
+        conn = get_db_connection()
+        # Use comma-separated list of IDs for a single DELETE query
+        query = f"DELETE FROM journals WHERE id IN ({','.join(['?'] * len(ids))})"
+        conn.execute(query, ids)
+        conn.commit()
+        conn.close()
+        return jsonify({'success': True, 'message': f'Successfully deleted {len(ids)} records'})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
 
 # ========= LOGIN HISTORY ROUTE =========
 @app.route('/login-history')

@@ -70,8 +70,10 @@ CREATE TABLE journals (
     journal_scope TEXT,
     vol_issue_page TEXT,
     month_year TEXT,
-    publication_year INTEGER,   -- ✅ NEW COLUMN (OPTIONAL BUT USEFUL)
+    publication_year INTEGER,
     issn_number TEXT,
+    publication_type TEXT DEFAULT 'Journal', -- ✅ CATEGORY: Journal, Paper, Book
+    status TEXT DEFAULT 'Published',         -- ✅ STATUS: Published, Submitted, Working Process
 
     -- Indexing & Metrics
     is_scopus INTEGER DEFAULT 0,

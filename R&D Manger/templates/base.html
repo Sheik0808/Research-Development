@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,13 +10,16 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
+
 <body>
     <!-- Navbar with Enhanced Design -->
     <nav class="navbar navbar-dark navbar-custom p-0">
         <div class="container-fluid px-4 py-2">
             <a class="navbar-brand fw-bold d-flex align-items-center" href="/">
                 <!-- KGISL Logo -->
-                <img src="{{ url_for('static', filename='images/kgisl_logo.png') }}" alt="KGISL Logo" style="height: 50px; margin-right: 12px; filter: brightness(1.1);" onerror="this.style.display='none'">
+                <img src="{{ url_for('static', filename='images/kgisl_logo.png') }}" alt="KGISL Logo"
+                    style="height: 50px; margin-right: 12px; filter: brightness(1.1);"
+                    onerror="this.style.display='none'">
                 <div style="display: flex; flex-direction: column; line-height: 1.2;">
                     <span style="font-size: 14px; font-weight: 300;">KGISL Institute of Technology</span>
                     <span style="font-size: 16px; font-weight: bold;">R&D Portal</span>
@@ -28,25 +32,29 @@
                 <a href="/view_journals" class="btn btn-outline-light btn-sm me-2">
                     <i class="bi bi-eye"></i> View Reports
                 </a>
+                <a href="/excel_dashboard" class="btn btn-outline-light btn-sm me-2">
+                    <i class="bi bi-table"></i> Excel Dashboard
+                </a>
                 <a href="/vision-mission" class="btn btn-outline-light btn-sm me-3">
                     <i class="bi bi-compass"></i> Vision & Mission
                 </a>
-                
+
                 <!-- Credits Badge -->
                 {% if user_credits is defined %}
                 <span class="badge bg-warning text-dark me-3" style="font-size: 14px;">
                     <i class="bi bi-star-fill"></i> {{ user_credits }} Credits
                 </span>
                 {% endif %}
-                
+
                 <!-- User Dropdown -->
                 <div class="dropdown">
-                    <button class="btn btn-outline-light btn-sm dropdown-toggle" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                    <button class="btn btn-outline-light btn-sm dropdown-toggle" type="button" id="userDropdown"
+                        data-bs-toggle="dropdown" aria-expanded="false">
                         <i class="bi bi-person-circle me-1"></i>
                         {% if session.get('full_name') %}
-                            {{ session.get('full_name').split()[0] }}
+                        {{ session.get('full_name').split()[0] }}
                         {% else %}
-                            User
+                        User
                         {% endif %}
                     </button>
                     <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
@@ -60,13 +68,17 @@
                                 <span class="badge bg-primary">{{ session.get('role', 'User').upper() }}</span>
                             </p>
                         </li>
-                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
                         <li>
                             <a class="dropdown-item" href="{{ url_for('login_history') }}">
                                 <i class="bi bi-clock-history me-2"></i> Login History
                             </a>
                         </li>
-                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
                         <li>
                             <a class="dropdown-item" href="{{ url_for('logout') }}">
                                 <i class="bi bi-box-arrow-right me-2"></i> Logout
@@ -77,7 +89,7 @@
             </div>
         </div>
     </nav>
-    
+
     <div class="main-content">
         {% block content %}{% endblock %}
     </div>
@@ -93,4 +105,5 @@
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="{{ url_for('static', filename='calendar.js') }}"></script>
 </body>
+
 </html>
