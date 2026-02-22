@@ -668,6 +668,16 @@ def excel_dashboard():
     status_filter = request.args.get('status', '')
     author_filter = request.args.get('author', '')
     title_filter = request.args.get('title', '')
+    publisher_filter = request.args.get('publisher', '')
+    journal_filter = request.args.get('journal_name', '')
+    scope_filter = request.args.get('scope', '')
+    issn_filter = request.args.get('issn', '')
+    scopus_filter = request.args.get('scopus', '')
+    sci_filter = request.args.get('sci', '')
+    wos_filter = request.args.get('wos', '')
+    year_filter = request.args.get('year', '')
+    collab_author_filter = request.args.get('collab_author', '')
+    journal_status_filter = request.args.get('journal_status', '')
     
     query = 'SELECT * FROM journals WHERE 1=1'
     params = []
@@ -687,6 +697,37 @@ def excel_dashboard():
     if title_filter:
         query += ' AND paper_title LIKE ?'
         params.append(f'%{title_filter}%')
+    if publisher_filter:
+        query += ' AND publisher LIKE ?'
+        params.append(f'%{publisher_filter}%')
+    if journal_filter:
+        query += ' AND journal_name LIKE ?'
+        params.append(f'%{journal_filter}%')
+    if scope_filter:
+        query += ' AND journal_scope = ?'
+        params.append(scope_filter)
+    if issn_filter:
+        query += ' AND issn_number LIKE ?'
+        params.append(f'%{issn_filter}%')
+    if scopus_filter:
+        query += ' AND is_scopus = ?'
+        params.append(int(scopus_filter))
+    if sci_filter:
+        query += ' AND is_sci_scie_ssci = ?'
+        params.append(int(sci_filter))
+    if wos_filter:
+        query += ' AND is_wos = ?'
+        params.append(int(wos_filter))
+    if year_filter:
+        query += ' AND (publication_year = ? OR month_year LIKE ?)'
+        params.append(year_filter)
+        params.append(f'%{year_filter}%')
+    if collab_author_filter:
+        query += ' AND collaborative_authors LIKE ?'
+        params.append(f'%{collab_author_filter}%')
+    if journal_status_filter:
+        query += ' AND journal_status = ?'
+        params.append(journal_status_filter)
         
     query += ' ORDER BY department ASC, paper_title ASC'
     journals = conn.execute(query, params).fetchall()
@@ -718,7 +759,15 @@ def excel_dashboard():
                           stats=stats, 
                           depts=depts,
                           dept_stats=dept_stats,
-                          current_filters={'dept': dept_filter, 'type': type_filter, 'status': status_filter, 'author': author_filter, 'title': title_filter})
+                          current_filters={
+                              'dept': dept_filter, 'type': type_filter, 'status': status_filter,
+                              'author': author_filter, 'title': title_filter,
+                              'publisher': publisher_filter, 'journal_name': journal_filter,
+                              'scope': scope_filter, 'issn': issn_filter,
+                              'scopus': scopus_filter, 'sci': sci_filter, 'wos': wos_filter,
+                              'year': year_filter, 'collab_author': collab_author_filter,
+                              'journal_status': journal_status_filter
+                          })
 
 @app.route('/upload_excel', methods=['POST'])
 @login_required
@@ -736,7 +785,24 @@ def upload_excel():
         file.save(file_path)
         
         try:
-            df = pd.read_excel(file_path)
+            # Read first 10 rows to find header row if not first
+            temp_df = pd.read_excel(file_path, nrows=10, header=None)
+            header_row = 0
+            found_header = False
+            
+            # Simple heuristic: row with most matches for common keywords is likely the header
+            keywords_to_find = ['title', 'journal', 'author', 'dept', 'issn', 'scopus']
+            max_matches = 0
+            
+            for idx, row in temp_df.iterrows():
+                matches = sum(1 for cell in row if any(kw in str(cell).lower() for kw in keywords_to_find))
+                if matches > max_matches:
+                    max_matches = matches
+                    header_row = idx
+                    found_header = True if matches >= 2 else False
+
+            # Read again with detected header row
+            df = pd.read_excel(file_path, header=header_row)
             if df.empty:
                 return jsonify({'success': False, 'error': 'The Excel file is empty'}), 400
             
@@ -746,7 +812,7 @@ def upload_excel():
             conn = get_db_connection()
             count = 0
             for _, row in df.iterrows():
-                # IMPROVED FUZZY MATCHER
+                # IMPROVED FUZZY MATCHER WITH NORMALIZATION
                 def get_val(df_row, primary_headers, keywords=None, default=None):
                     # 1. Try exact/primary matches
                     for h in primary_headers:
@@ -767,28 +833,52 @@ def upload_excel():
                     
                     return default
 
+                def normalize_bool(val):
+                    if val is None or pd.isna(val): return 0
+                    s = str(val).strip().lower()
+                    if s in ['1', '1.0', 'yes', 'y', '✓', 'true', 'scopus', 'sci', 'wos']: return 1
+                    return 0
+
+                def to_float(val):
+                    if val is None or pd.isna(val): return None
+                    try:
+                        return float(str(val).strip())
+                    except (ValueError, TypeError):
+                        return None
+
                 data = (
                     get_val(row, ['Journal Status'], ['status'], 'Published'),
                     get_val(row, ['Department', 'Department Name', 'Dept', 'Branch', 'Dept.'], ['dept', 'department', 'branch']),
-                    get_val(row, ['Author Position'], ['position']),
+                    get_val(row, ['Author Position', 'Author Prefix'], ['position', 'prefix']),
                     get_val(row, ['Author Name'], ['author', 'name', 'faculty']),
                     get_val(row, ['Collaborative Authors'], ['collaborator', 'co-author'], ''),
-                    get_val(row, ['Paper Title', 'Title of Paper', 'Title'], ['title', 'paper', 'article', 'top']),
+                    get_val(row, ['Paper Title', 'Title of Paper', 'Title of the Paper', 'Title'], ['title', 'research', 'article', 'topic', 'name', 'paper', 'article', 'top']),
                     get_val(row, ['Publisher'], ['publisher', 'press'], ''),
-                    get_val(row, ['Journal Name'], ['journal', 'publication'], ''),
-                    get_val(row, ['Journal Scope'], ['scope', 'field'], ''),
-                    get_val(row, ['Vol/Issue/Page'], ['volume', 'issue', 'page'], ''),
-                    get_val(row, ['Month/Year'], ['month', 'year', 'date'], ''),
-                    get_val(row, ['ISSN'], ['issn'], ''),
-                    get_val(row, ['Scopus'], ['scopus'], 0),
-                    get_val(row, ['SCI'], ['sci'], 0),
-                    get_val(row, ['WoS'], ['wos'], 0),
+                    get_val(row, ['Journal Name', 'Name of the Journal'], ['journal', 'publication'], ''),
+                    get_val(row, ['Journal Scope', 'International/National'], ['scope', 'field', 'international', 'national'], ''),
+                    get_val(row, ['Vol/Issue/Page', 'Volume'], ['volume', 'issue', 'page'], ''),
+                    get_val(row, ['Month/Year', 'Month'], ['month'], ''),
+                    get_val(row, ['ISSN', 'ISSN Number'], ['issn'], ''),
+                    normalize_bool(get_val(row, ['Scopus'], ['scopus'])),
+                    normalize_bool(get_val(row, ['SCI', 'SCI/SCIE/SSCI'], ['sci', 'scie', 'ssci'])),
+                    normalize_bool(get_val(row, ['WoS', 'Web of Science'], ['wos'])),
+                    to_float(get_val(row, ['Impact Factor'], ['impact'])),
+                    to_float(get_val(row, ['Citation Score', 'Citation'], ['citation'])),
+                    get_val(row, ['SJR', 'SJR Rating'], ['sjr'], None),
+                    to_float(get_val(row, ['h-index', 'H Index', 'h index'], ['h-index', 'hindex'])),
+                    get_val(row, ['Anna Univ', 'Q1 to Q4', 'Q1-Q4', 'Quartile'], ['anna', 'quartile', 'q1'], None),
+                    get_val(row, ['Preview', 'Plotview', 'Preview Link'], ['preview', 'plotview'], None),
+                    get_val(row, ['Journal Metrics Page', 'Home Page', 'Home Page Link'], ['metrics', 'home page'], None),
+                    get_val(row, ['DOI', 'DOI Link'], ['doi'], None),
+                    get_val(row, ['Collab Scope', 'International/National Indexing', 'Collaboration Scope'], ['collab scope', 'indexing scope'], None),
+                    get_val(row, ['Collab Institution', 'National Indexing', 'Agency', 'National/International Agency'], ['collab inst', 'agency'], None),
                     get_val(row, ['Publication Type'], ['type', 'category', 'kind'], 'Journal'),
-                    get_val(row, ['Status', 'Publication Status', 'Working Status', 'Paper Status'], ['working', 'progress', 'status'], 'Published')
+                    get_val(row, ['Status', 'Publication Status', 'Working Status', 'Paper Status'], ['working', 'progress', 'status'], 'Published'),
+                    get_val(row, ['Publication Year', 'Year'], ['year', 'pub year'], None),
                 )
                 
-                # Check for essential data - skip if all important fields are missing
-                if not any([data[1], data[3], data[5], data[7]]): # Dept, Author, Title, Journal Name
+                # Check for essential data - more lenient: skip only if both title and journal name are missing
+                if not data[5] and not data[7]: 
                     continue
 
                 conn.execute("""
@@ -796,15 +886,22 @@ def upload_excel():
                         journal_status, department, author_position, author_name, collaborative_authors,
                         paper_title, publisher, journal_name, journal_scope, vol_issue_page,
                         month_year, issn_number, is_scopus, is_sci_scie_ssci, is_wos,
-                        publication_type, status
+                        impact_factor, citation_score, sjr_rating, h_index, anna_univ_list,
+                        preview_link, home_page_link, doi_link,
+                        collab_scope, collab_institution,
+                        publication_type, status, publication_year
                     )
-                    VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+                    VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
                 """, data)
                 count += 1
             
             conn.commit()
             conn.close()
             
+            if count == 0:
+                cols_str = ", ".join(df.columns[:10]) # Show first 10 columns for debugging
+                return jsonify({'success': False, 'error': f'No valid data rows found. Detected columns: {cols_str}. Make sure your Excel has a "Paper Title" or "Journal Name" column.'}), 400
+
             # Identify departments found for feedback
             dept_cols = [c for c in df.columns if any(kw in str(c).lower() for kw in ['dept', 'department', 'branch'])]
             depts_found = df[dept_cols[0]].dropna().unique().tolist() if not df.empty and dept_cols else []

@@ -89,11 +89,11 @@
                     <h5 class="fw-bold mb-4">Filters</h5>
 
                     <form action="/excel_dashboard" method="get" id="filterForm">
-                        <!-- Paper Title Filter -->
-                        <div class="mb-4">
+                        <!-- Search Filters -->
+                        <div class="mb-3">
                             <label class="form-label fw-bold small text-muted text-uppercase text-primary">Paper
                                 Title</label>
-                            <div class="input-group">
+                            <div class="input-group input-group-sm">
                                 <span class="input-group-text bg-white border-end-0">
                                     <i class="bi bi-search text-primary"></i>
                                 </span>
@@ -103,32 +103,10 @@
                             </div>
                         </div>
 
-                        <!-- Paper Status Filter -->
-                        <div class="mb-4">
-                            <label class="form-label fw-bold small text-muted text-uppercase text-primary">Paper
-                                Status</label>
-                            <select name="status" class="form-select filter-trigger shadow-none">
-                                <option value="">All Statuses</option>
-                                <option value="Published" {% if current_filters.status=='Published' %}selected{% endif
-                                    %}>
-                                    Published</option>
-                                <option value="Accepted" {% if current_filters.status=='Accepted' %}selected{% endif %}>
-                                    Accepted</option>
-                                <option value="Submitted" {% if current_filters.status=='Submitted' %}selected{% endif
-                                    %}>
-                                    Submitted</option>
-                                <option value="Rejected" {% if current_filters.status=='Rejected' %}selected{% endif %}>
-                                    Rejected</option>
-                                <option value="Working Process" {% if current_filters.status=='Working Process'
-                                    %}selected{% endif %}>Working Process</option>
-                            </select>
-                        </div>
-
-                        <!-- Author Filter -->
-                        <div class="mb-4">
+                        <div class="mb-3">
                             <label class="form-label fw-bold small text-muted text-uppercase text-primary">Author
                                 Name</label>
-                            <div class="input-group">
+                            <div class="input-group input-group-sm">
                                 <span class="input-group-text bg-white border-end-0">
                                     <i class="bi bi-person text-primary"></i>
                                 </span>
@@ -138,12 +116,106 @@
                             </div>
                         </div>
 
-                        <hr class="my-4" style="border-top: 2px dashed #eee;">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold small text-muted text-uppercase text-primary">Collaborative
+                                Authors</label>
+                            <div class="input-group input-group-sm">
+                                <span class="input-group-text bg-white border-end-0">
+                                    <i class="bi bi-people text-primary"></i>
+                                </span>
+                                <input type="text" name="collab_author"
+                                    class="form-control border-start-0 filter-trigger shadow-none"
+                                    placeholder="Search collaborators..."
+                                    value="{{ current_filters.collab_author or '' }}">
+                            </div>
+                        </div>
 
-                        <!-- Department Filter -->
-                        <div class="mb-4">
+                        <div class="mb-3">
+                            <label
+                                class="form-label fw-bold small text-muted text-uppercase text-primary">Publisher</label>
+                            <div class="input-group input-group-sm">
+                                <span class="input-group-text bg-white border-end-0">
+                                    <i class="bi bi-building text-primary"></i>
+                                </span>
+                                <input type="text" name="publisher"
+                                    class="form-control border-start-0 filter-trigger shadow-none"
+                                    placeholder="Search publisher..." value="{{ current_filters.publisher or '' }}">
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold small text-muted text-uppercase text-primary">Journal
+                                Name</label>
+                            <div class="input-group input-group-sm">
+                                <span class="input-group-text bg-white border-end-0">
+                                    <i class="bi bi-journal-text text-primary"></i>
+                                </span>
+                                <input type="text" name="journal_name"
+                                    class="form-control border-start-0 filter-trigger shadow-none"
+                                    placeholder="Search journal..." value="{{ current_filters.journal_name or '' }}">
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold small text-muted text-uppercase text-primary">ISSN</label>
+                            <div class="input-group input-group-sm">
+                                <span class="input-group-text bg-white border-end-0">
+                                    <i class="bi bi-upc text-primary"></i>
+                                </span>
+                                <input type="text" name="issn"
+                                    class="form-control border-start-0 filter-trigger shadow-none"
+                                    placeholder="Search ISSN..." value="{{ current_filters.issn or '' }}">
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold small text-muted text-uppercase text-primary">Year</label>
+                            <div class="input-group input-group-sm">
+                                <span class="input-group-text bg-white border-end-0">
+                                    <i class="bi bi-calendar text-primary"></i>
+                                </span>
+                                <input type="text" name="year"
+                                    class="form-control border-start-0 filter-trigger shadow-none"
+                                    placeholder="e.g. 2024" value="{{ current_filters.year or '' }}">
+                            </div>
+                        </div>
+
+                        <hr class="my-3" style="border-top: 2px dashed #eee;">
+
+                        <!-- Dropdown Filters -->
+                        <div class="mb-3">
+                            <label class="form-label fw-bold small text-muted text-uppercase">Paper Status</label>
+                            <select name="status" class="form-select form-select-sm filter-trigger shadow-none">
+                                <option value="">All Statuses</option>
+                                <option value="Published" {% if current_filters.status=='Published' %}selected{% endif
+                                    %}>Published</option>
+                                <option value="Accepted" {% if current_filters.status=='Accepted' %}selected{% endif %}>
+                                    Accepted</option>
+                                <option value="Submitted" {% if current_filters.status=='Submitted' %}selected{% endif
+                                    %}>Submitted</option>
+                                <option value="Rejected" {% if current_filters.status=='Rejected' %}selected{% endif %}>
+                                    Rejected</option>
+                                <option value="Working Process" {% if current_filters.status=='Working Process'
+                                    %}selected{% endif %}>Working Process</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold small text-muted text-uppercase">Journal Status</label>
+                            <select name="journal_status" class="form-select form-select-sm filter-trigger shadow-none">
+                                <option value="">All</option>
+                                <option value="Published" {% if current_filters.journal_status=='Published' %}selected{%
+                                    endif %}>Published</option>
+                                <option value="Accepted" {% if current_filters.journal_status=='Accepted' %}selected{%
+                                    endif %}>Accepted</option>
+                                <option value="Submitted" {% if current_filters.journal_status=='Submitted' %}selected{%
+                                    endif %}>Submitted</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
                             <label class="form-label fw-bold small text-muted text-uppercase">Department</label>
-                            <select name="dept" class="form-select filter-trigger shadow-none">
+                            <select name="dept" class="form-select form-select-sm filter-trigger shadow-none">
                                 <option value="">All Departments</option>
                                 <option value="AIDS" {% if current_filters.dept=='AIDS' %}selected{% endif %}>AIDS
                                 </option>
@@ -171,14 +243,12 @@
                             </select>
                         </div>
 
-                        <!-- Category Filter -->
-                        <div class="mb-4">
+                        <div class="mb-3">
                             <label class="form-label fw-bold small text-muted text-uppercase">Publication Type</label>
-                            <select name="type" class="form-select filter-trigger shadow-none">
+                            <select name="type" class="form-select form-select-sm filter-trigger shadow-none">
                                 <option value="">All Categories</option>
                                 <option value="Journal" {% if current_filters.type=='Journal' %}selected{% endif %}>
-                                    Journal
-                                </option>
+                                    Journal</option>
                                 <option value="Paper" {% if current_filters.type=='Paper' %}selected{% endif %}>Paper
                                 </option>
                                 <option value="Book" {% if current_filters.type=='Book' %}selected{% endif %}>Book
@@ -186,9 +256,52 @@
                             </select>
                         </div>
 
+                        <div class="mb-3">
+                            <label class="form-label fw-bold small text-muted text-uppercase">Scope</label>
+                            <select name="scope" class="form-select form-select-sm filter-trigger shadow-none">
+                                <option value="">All</option>
+                                <option value="International" {% if current_filters.scope=='International' %}selected{%
+                                    endif %}>International</option>
+                                <option value="National" {% if current_filters.scope=='National' %}selected{% endif %}>
+                                    National</option>
+                            </select>
+                        </div>
+
+                        <hr class="my-3" style="border-top: 2px dashed #eee;">
+
+                        <!-- Indexing Filters -->
+                        <label class="form-label fw-bold small text-muted text-uppercase">Indexing</label>
+                        <div class="row g-2 mb-3">
+                            <div class="col-4">
+                                <select name="scopus" class="form-select form-select-sm filter-trigger shadow-none">
+                                    <option value="">Scopus</option>
+                                    <option value="1" {% if current_filters.scopus=='1' %}selected{% endif %}>✓ Yes
+                                    </option>
+                                    <option value="0" {% if current_filters.scopus=='0' %}selected{% endif %}>✗ No
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="col-4">
+                                <select name="sci" class="form-select form-select-sm filter-trigger shadow-none">
+                                    <option value="">SCI</option>
+                                    <option value="1" {% if current_filters.sci=='1' %}selected{% endif %}>✓ Yes
+                                    </option>
+                                    <option value="0" {% if current_filters.sci=='0' %}selected{% endif %}>✗ No</option>
+                                </select>
+                            </div>
+                            <div class="col-4">
+                                <select name="wos" class="form-select form-select-sm filter-trigger shadow-none">
+                                    <option value="">WoS</option>
+                                    <option value="1" {% if current_filters.wos=='1' %}selected{% endif %}>✓ Yes
+                                    </option>
+                                    <option value="0" {% if current_filters.wos=='0' %}selected{% endif %}>✗ No</option>
+                                </select>
+                            </div>
+                        </div>
+
                         <div class="d-grid gap-2">
-                            <button type="submit" class="btn btn-primary">Apply Filters</button>
-                            <a href="/excel_dashboard" class="btn btn-outline-secondary">Clear All</a>
+                            <button type="submit" class="btn btn-primary btn-sm">Apply Filters</button>
+                            <a href="/excel_dashboard" class="btn btn-outline-secondary btn-sm">Clear All</a>
                         </div>
                     </form>
                 </div>
@@ -199,7 +312,16 @@
                 <div class="card border-0 shadow-sm">
                     <div class="card-header bg-white py-3">
                         <div class="d-flex justify-content-between align-items-center">
-                            <h6 class="fw-bold mb-0">Filtered Results ({{ journals|length }})</h6>
+                            <div class="d-flex align-items-center">
+                                <h6 class="fw-bold mb-0 me-2 text-nowrap">Filtered Results ({{ journals|length }})</h6>
+                                {% if current_filters.dept %}
+                                <span
+                                    class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-2 ms-2"
+                                    style="font-size: 0.85rem;">
+                                    <i class="bi bi-diagram-3 me-1"></i> Dept: {{ current_filters.dept }}
+                                </span>
+                                {% endif %}
+                            </div>
                             <div class="d-flex gap-2">
                                 <button id="bulkDeleteBtn" class="btn btn-sm btn-danger d-none"
                                     onclick="deleteSelected()">
@@ -219,61 +341,159 @@
                         </div>
                     </div>
                     <div class="card-body p-0">
-                        <div class="table-responsive" style="max-height: 70vh;">
-                            <table class="table table-hover align-middle mb-0">
-                                <thead class="bg-light sticky-top">
+                        <div class="table-responsive excel-table-wrapper" style="max-height: 75vh;">
+                            <table class="table table-hover table-bordered align-middle mb-0 excel-table">
+                                <thead class="bg-light sticky-top" style="z-index: 2;">
                                     <tr>
-                                        <th class="ps-4" style="width: 40px;">
-                                            <div class="form-check">
+                                        <th class="sticky-col col-check text-center">
+                                            <div class="form-check d-inline-block">
                                                 <input class="form-check-input" type="checkbox" id="selectAll">
                                             </div>
                                         </th>
-                                        <th>Paper Title</th>
-                                        <th>Author</th>
-                                        <th>Status</th>
-                                        <th>Dept</th>
-                                        <th>Type</th>
-                                        <th>Index</th>
-                                        <th class="pe-4">Action</th>
+                                        <th class="sticky-col col-sno text-center">S.No</th>
+                                        <th class="text-nowrap">Journal Status</th>
+                                        <th class="text-nowrap">Dept</th>
+                                        <th class="text-nowrap">Author Position</th>
+                                        <th class="text-nowrap">Author Name</th>
+                                        <th class="text-nowrap">Collaborative Authors</th>
+                                        <th class="text-nowrap" style="min-width: 250px;">Title of the Paper</th>
+                                        <th class="text-nowrap">Publisher</th>
+                                        <th class="text-nowrap" style="min-width: 200px;">Name of the Journal</th>
+                                        <th class="text-nowrap">Int'l / National</th>
+                                        <th class="text-nowrap">Vol/Issue/Page</th>
+                                        <th class="text-nowrap">Month/Year</th>
+                                        <th class="text-nowrap">Year</th>
+                                        <th class="text-nowrap">ISSN</th>
+                                        <th class="text-nowrap text-center">Scopus</th>
+                                        <th class="text-nowrap text-center">SCI/SCIE/SSCI</th>
+                                        <th class="text-nowrap">Impact Factor</th>
+                                        <th class="text-nowrap">Citation Score</th>
+                                        <th class="text-nowrap">SJR</th>
+                                        <th class="text-nowrap">h-index</th>
+                                        <th class="text-nowrap">Q1-Q4</th>
+                                        <th class="text-nowrap text-center">WoS</th>
+                                        <th class="text-nowrap">Preview Link</th>
+                                        <th class="text-nowrap">Journal Metrics</th>
+                                        <th class="text-nowrap">DOI Link</th>
+                                        <th class="text-nowrap">Collab Scope</th>
+                                        <th class="text-nowrap">Collab Institution</th>
+                                        <th class="text-nowrap">Status</th>
+                                        <th class="text-nowrap">Type</th>
+                                        <th class="sticky-col col-action text-center text-nowrap">Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {% for j in journals %}
                                     <tr>
-                                        <td class="ps-4">
-                                            <div class="form-check">
+                                        <td class="sticky-col col-check text-center">
+                                            <div class="form-check d-inline-block">
                                                 <input class="form-check-input journal-check" type="checkbox"
                                                     value="{{ j.id }}">
                                             </div>
                                         </td>
-                                        <td>
-                                            <div class="fw-bold text-dark text-truncate" style="max-width: 300px;"
-                                                title="{{ j.paper_title or 'N/A' }}">
-                                                {{ j.paper_title or 'N/A' }}
-                                            </div>
-                                            <small class="text-muted">{{ j.journal_name or 'N/A' }}</small>
+                                        <td class="sticky-col col-sno text-center fw-bold text-muted">{{ loop.index }}
                                         </td>
-                                        <td>{{ j.author_name or 'N/A' }}</td>
+                                        <td>{{ j.journal_status or '-' }}</td>
+                                        <td><span class="badge bg-primary-subtle text-primary">{{ j.department or '-'
+                                                }}</span></td>
+                                        <td>{{ j.author_position or '-' }}</td>
+                                        <td class="fw-semibold">{{ j.author_name or '-' }}</td>
+                                        <td class="text-truncate" style="max-width: 180px;"
+                                            title="{{ j.collaborative_authors or '' }}">{{ j.collaborative_authors or
+                                            '-' }}</td>
+                                        <td>
+                                            <div class="text-truncate fw-bold" style="max-width: 280px;"
+                                                title="{{ j.paper_title or '' }}">
+                                                {{ j.paper_title or '-' }}
+                                            </div>
+                                        </td>
+                                        <td>{{ j.publisher or '-' }}</td>
+                                        <td>
+                                            <div class="text-truncate" style="max-width: 220px;"
+                                                title="{{ j.journal_name or '' }}">
+                                                {{ j.journal_name or '-' }}
+                                            </div>
+                                        </td>
+                                        <td>
+                                            {% if j.journal_scope %}
+                                            {% if 'International' in (j.journal_scope or '') %}
+                                            <span class="badge bg-success-subtle text-success">Int'l</span>
+                                            {% else %}
+                                            <span class="badge bg-warning-subtle text-warning">National</span>
+                                            {% endif %}
+                                            {% else %}-{% endif %}
+                                        </td>
+                                        <td>{{ j.vol_issue_page or '-' }}</td>
+                                        <td>{{ j.month_year or '-' }}</td>
+                                        <td>{{ j.publication_year or '-' }}</td>
+                                        <td class="font-monospace small">{{ j.issn_number or '-' }}</td>
+                                        <td class="text-center">
+                                            {% if j.is_scopus %}
+                                            <span class="badge bg-success"><i class="bi bi-check-lg"></i></span>
+                                            {% else %}<span class="text-muted">-</span>{% endif %}
+                                        </td>
+                                        <td class="text-center">
+                                            {% if j.is_sci_scie_ssci %}
+                                            <span class="badge bg-info"><i class="bi bi-check-lg"></i></span>
+                                            {% else %}<span class="text-muted">-</span>{% endif %}
+                                        </td>
+                                        <td>{{ j.impact_factor or '-' }}</td>
+                                        <td>{{ j.citation_score or '-' }}</td>
+                                        <td>{{ j.sjr_rating or '-' }}</td>
+                                        <td>{{ j.h_index or '-' }}</td>
+                                        <td>{{ j.anna_univ_list or '-' }}</td>
+                                        <td class="text-center">
+                                            {% if j.is_wos %}
+                                            <span class="badge bg-dark"><i class="bi bi-check-lg"></i></span>
+                                            {% else %}<span class="text-muted">-</span>{% endif %}
+                                        </td>
+                                        <td>
+                                            {% if j.preview_link %}
+                                            <a href="{{ j.preview_link }}" target="_blank"
+                                                class="btn btn-sm btn-outline-primary py-0 px-2"
+                                                title="{{ j.preview_link }}">
+                                                <i class="bi bi-box-arrow-up-right"></i>
+                                            </a>
+                                            {% else %}-{% endif %}
+                                        </td>
+                                        <td>
+                                            {% if j.home_page_link %}
+                                            <a href="{{ j.home_page_link }}" target="_blank"
+                                                class="btn btn-sm btn-outline-secondary py-0 px-2"
+                                                title="{{ j.home_page_link }}">
+                                                <i class="bi bi-globe"></i>
+                                            </a>
+                                            {% else %}-{% endif %}
+                                        </td>
+                                        <td>
+                                            {% if j.doi_link %}
+                                            <a href="{{ j.doi_link }}" target="_blank"
+                                                class="btn btn-sm btn-outline-success py-0 px-2"
+                                                title="{{ j.doi_link }}">
+                                                <i class="bi bi-link-45deg"></i> DOI
+                                            </a>
+                                            {% else %}-{% endif %}
+                                        </td>
+                                        <td>{{ j.collab_scope or '-' }}</td>
+                                        <td>{{ j.collab_institution or '-' }}</td>
                                         <td>
                                             {% if j.status == 'Published' %}
-                                            <span class="badge bg-success-subtle text-success border-0 px-3"><i
-                                                    class="bi bi-check-circle-fill me-1"></i> Published</span>
+                                            <span class="badge bg-success-subtle text-success border-0 px-2"><i
+                                                    class="bi bi-check-circle-fill me-1"></i>Published</span>
                                             {% elif j.status == 'Submitted' %}
-                                            <span class="badge bg-primary-subtle text-primary border-0 px-3"><i
-                                                    class="bi bi-send-fill me-1"></i> Submitted</span>
+                                            <span class="badge bg-primary-subtle text-primary border-0 px-2"><i
+                                                    class="bi bi-send-fill me-1"></i>Submitted</span>
                                             {% elif j.status == 'Accepted' %}
-                                            <span class="badge bg-info-subtle text-info border-0 px-3"><i
-                                                    class="bi bi-patch-check-fill me-1"></i> Accepted</span>
+                                            <span class="badge bg-info-subtle text-info border-0 px-2"><i
+                                                    class="bi bi-patch-check-fill me-1"></i>Accepted</span>
                                             {% elif j.status == 'Rejected' %}
-                                            <span class="badge bg-danger-subtle text-danger border-0 px-3"><i
-                                                    class="bi bi-x-circle-fill me-1"></i> Rejected</span>
+                                            <span class="badge bg-danger-subtle text-danger border-0 px-2"><i
+                                                    class="bi bi-x-circle-fill me-1"></i>Rejected</span>
                                             {% else %}
-                                            <span class="badge bg-secondary-subtle text-secondary border-0 px-3">{{
-                                                j.status
-                                                or 'N/A' }}</span>
+                                            <span class="badge bg-secondary-subtle text-secondary border-0 px-2">{{
+                                                j.status or '-' }}</span>
                                             {% endif %}
                                         </td>
-                                        <td>{{ j.department or 'N/A' }}</td>
                                         <td>
                                             {% if j.publication_type == 'Book' %}
                                             <span class="text-warning small"><i class="bi bi-book"></i> Book</span>
@@ -284,21 +504,8 @@
                                                 Journal</span>
                                             {% endif %}
                                         </td>
-                                        <td>
-                                            <div class="d-flex gap-1">
-                                                {% if j.is_scopus %}<span
-                                                    class="badge bg-dark-subtle text-dark border">S</span>{% endif %}
-                                                {% if j.is_sci_scie_ssci %}<span
-                                                    class="badge bg-dark-subtle text-dark border">SCI</span>{% endif %}
-                                                {% if j.is_wos %}<span
-                                                    class="badge bg-dark-subtle text-dark border">W</span>{% endif %}
-                                            </div>
-                                        </td>
-                                        <td class="pe-4 text-end">
-                                            <div class="d-flex justify-content-end gap-1">
-                                                <button class="btn btn-sm btn-icon btn-light" title="View Details">
-                                                    <i class="bi bi-eye"></i>
-                                                </button>
+                                        <td class="sticky-col col-action text-center">
+                                            <div class="d-flex justify-content-center gap-1">
                                                 <button class="btn btn-sm btn-icon btn-outline-danger"
                                                     onclick="deleteJournal({{ j.id }})" title="Delete Record">
                                                     <i class="bi bi-trash"></i>
@@ -308,13 +515,12 @@
                                     </tr>
                                     {% else %}
                                     <tr>
-                                        <td colspan="7" class="text-center py-5">
+                                        <td colspan="31" class="text-center py-5">
                                             <div class="py-5">
                                                 <i class="bi bi-inbox display-4 text-muted mb-3 d-block"></i>
                                                 <h5>No records found</h5>
                                                 <p class="text-muted">Try adjusting your filters or upload a new Excel
-                                                    file.
-                                                </p>
+                                                    file.</p>
                                             </div>
                                         </td>
                                     </tr>
@@ -377,13 +583,13 @@
         }
 
         .btn-icon {
-            width: 32px;
-            height: 32px;
+            width: 28px;
+            height: 28px;
             padding: 0;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            border-radius: 8px;
+            border-radius: 6px;
         }
 
         .bg-dark-subtle {
@@ -393,6 +599,96 @@
         .filter-trigger:focus {
             border-color: #667eea;
             box-shadow: 0 0 0 0.25rem rgba(102, 126, 234, 0.25);
+        }
+
+        /* Excel-like table styling */
+        .excel-table-wrapper {
+            overflow-x: auto;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .excel-table {
+            font-size: 12px;
+            white-space: nowrap;
+        }
+
+        .excel-table thead th {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            color: #495057;
+            background-color: #e9ecef !important;
+            border-bottom: 2px solid #dee2e6;
+            padding: 8px 10px;
+            vertical-align: middle;
+        }
+
+        .excel-table tbody td {
+            padding: 6px 10px;
+            vertical-align: middle;
+            border-color: #eee;
+        }
+
+        .excel-table tbody tr:hover {
+            background-color: #f0f4ff !important;
+        }
+
+        /* Sticky columns */
+        .sticky-col {
+            position: sticky;
+            background-color: #fff;
+            z-index: 1;
+        }
+
+        .excel-table thead .sticky-col {
+            background-color: #e9ecef !important;
+            z-index: 3;
+        }
+
+        .col-check {
+            left: 0;
+            min-width: 40px;
+            max-width: 40px;
+        }
+
+        .col-sno {
+            left: 40px;
+            min-width: 50px;
+            max-width: 50px;
+            border-right: 2px solid #dee2e6 !important;
+        }
+
+        .col-action {
+            right: 0;
+            min-width: 60px;
+            max-width: 60px;
+            border-left: 2px solid #dee2e6 !important;
+        }
+
+        .excel-table tbody tr:hover .sticky-col {
+            background-color: #f0f4ff !important;
+        }
+
+        /* Scrollbar styling */
+        .excel-table-wrapper::-webkit-scrollbar {
+            height: 8px;
+            width: 8px;
+        }
+
+        .excel-table-wrapper::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+
+        .excel-table-wrapper::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 4px;
+        }
+
+        .excel-table-wrapper::-webkit-scrollbar-thumb:hover {
+            background: #a1a1a1;
         }
     </style>
 
@@ -460,9 +756,9 @@
                 });
             });
 
-            // Add event listener for the Author and Title inputs (debounce for better UX)
+            // Add event listener for all text search inputs (debounce for better UX)
             let debounceTimer;
-            const searchInputs = document.querySelectorAll('input[name="author"], input[name="title"]');
+            const searchInputs = document.querySelectorAll('input[name="author"], input[name="title"], input[name="publisher"], input[name="journal_name"], input[name="collab_author"], input[name="issn"], input[name="year"]');
             searchInputs.forEach(input => {
                 input.addEventListener('input', () => {
                     clearTimeout(debounceTimer);
