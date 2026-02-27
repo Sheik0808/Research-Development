@@ -82,237 +82,285 @@
             </div>
         </div>
 
-        <div class="row">
+        <div class="row" id="filterDataRow">
             <!-- Filter Sidebar -->
-            <div class="col-lg-3 col-md-4 mb-4">
-                <div class="card border-0 shadow-sm p-4 sticky-top" style="top: 20px;">
-                    <h5 class="fw-bold mb-4">Filters</h5>
+            <div class="col-lg-3 col-md-4 mb-4" id="filterSidebar">
+                <div class="card border-0 shadow-sm sticky-top" style="top: 20px; max-height: calc(100vh - 100px);">
+                    <!-- Filter Header -->
+                    <div class="card-header bg-primary text-white py-3 px-4 rounded-top d-flex justify-content-between align-items-center">
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-funnel me-2"></i>
+                            <h5 class="fw-bold mb-0">Filters</h5>
+                        </div>
+                        <button type="button" class="btn btn-sm btn-light" id="toggleFilterBtn" title="Hide filters">
+                            <i class="bi bi-chevron-left"></i>
+                        </button>
+                    </div>
 
-                    <form action="/excel_dashboard" method="get" id="filterForm">
-                        <!-- Search Filters -->
-                        <div class="mb-3">
-                            <label class="form-label fw-bold small text-muted text-uppercase text-primary">Paper
-                                Title</label>
-                            <div class="input-group input-group-sm">
-                                <span class="input-group-text bg-white border-end-0">
-                                    <i class="bi bi-search text-primary"></i>
-                                </span>
-                                <input type="text" name="title"
-                                    class="form-control border-start-0 filter-trigger shadow-none"
-                                    placeholder="Search by title..." value="{{ current_filters.title or '' }}">
+                    <form action="/excel_dashboard" method="get" id="filterForm" class="p-4" style="max-height: calc(100vh - 200px); overflow-y: auto;">
+                        <!-- Search Section -->
+                        <div class="mb-4">
+                            <h6 class="text-uppercase fw-bold text-muted small mb-3 pb-2 border-bottom">
+                                <i class="bi bi-search text-primary me-1"></i>Search
+                            </h6>
+                            
+                            <div class="mb-3">
+                                <label class="form-label fw-bold small text-muted">Paper Title</label>
+                                <div class="input-group input-group-sm">
+                                    <span class="input-group-text bg-white border-end-0">
+                                        <i class="bi bi-file-text text-primary"></i>
+                                    </span>
+                                    <input type="text" name="title"
+                                        class="form-control border-start-0 filter-trigger shadow-none"
+                                        placeholder="Search title..." value="{{ current_filters.title or '' }}">
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label fw-bold small text-muted">Author Name</label>
+                                <div class="input-group input-group-sm">
+                                    <span class="input-group-text bg-white border-end-0">
+                                        <i class="bi bi-person text-primary"></i>
+                                    </span>
+                                    <input type="text" name="author"
+                                        class="form-control border-start-0 filter-trigger shadow-none"
+                                        placeholder="Search author..." value="{{ current_filters.author or '' }}">
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label fw-bold small text-muted">Collaborative Authors</label>
+                                <div class="input-group input-group-sm">
+                                    <span class="input-group-text bg-white border-end-0">
+                                        <i class="bi bi-people text-primary"></i>
+                                    </span>
+                                    <input type="text" name="collab_author"
+                                        class="form-control border-start-0 filter-trigger shadow-none"
+                                        placeholder="Search collaborators..."
+                                        value="{{ current_filters.collab_author or '' }}">
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label fw-bold small text-muted">Publisher</label>
+                                <div class="input-group input-group-sm">
+                                    <span class="input-group-text bg-white border-end-0">
+                                        <i class="bi bi-building text-primary"></i>
+                                    </span>
+                                    <input type="text" name="publisher"
+                                        class="form-control border-start-0 filter-trigger shadow-none"
+                                        placeholder="Search publisher..." value="{{ current_filters.publisher or '' }}">
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label fw-bold small text-muted">Journal Name</label>
+                                <div class="input-group input-group-sm">
+                                    <span class="input-group-text bg-white border-end-0">
+                                        <i class="bi bi-journal-text text-primary"></i>
+                                    </span>
+                                    <input type="text" name="journal_name"
+                                        class="form-control border-start-0 filter-trigger shadow-none"
+                                        placeholder="Search journal..." value="{{ current_filters.journal_name or '' }}">
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label fw-bold small text-muted">ISSN</label>
+                                <div class="input-group input-group-sm">
+                                    <span class="input-group-text bg-white border-end-0">
+                                        <i class="bi bi-upc text-primary"></i>
+                                    </span>
+                                    <input type="text" name="issn"
+                                        class="form-control border-start-0 filter-trigger shadow-none"
+                                        placeholder="Search ISSN..." value="{{ current_filters.issn or '' }}">
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="form-label fw-bold small text-muted">Year</label>
+                                <div class="input-group input-group-sm">
+                                    <span class="input-group-text bg-white border-end-0">
+                                        <i class="bi bi-calendar-event text-primary"></i>
+                                    </span>
+                                    <input type="text" name="year"
+                                        class="form-control border-start-0 filter-trigger shadow-none"
+                                        placeholder="e.g. 2024" value="{{ current_filters.year or '' }}">
+                                </div>
                             </div>
                         </div>
 
-                        <div class="mb-3">
-                            <label class="form-label fw-bold small text-muted text-uppercase text-primary">Author
-                                Name</label>
-                            <div class="input-group input-group-sm">
-                                <span class="input-group-text bg-white border-end-0">
-                                    <i class="bi bi-person text-primary"></i>
-                                </span>
-                                <input type="text" name="author"
-                                    class="form-control border-start-0 filter-trigger shadow-none"
-                                    placeholder="Search author..." value="{{ current_filters.author or '' }}">
+                        <hr class="my-0">
+
+                        <!-- Status & Classification Section -->
+                        <div class="mb-4 mt-4">
+                            <h6 class="text-uppercase fw-bold text-muted small mb-3 pb-2 border-bottom">
+                                <i class="bi bi-shield-check text-info me-1"></i>Status & Type
+                            </h6>
+
+                            <div class="mb-3">
+                                <label class="form-label fw-bold small text-muted">Paper Status</label>
+                                <select name="status" class="form-select form-select-sm filter-trigger shadow-none">
+                                    <option value="">All Statuses</option>
+                                    <option value="Published" {% if current_filters.status=='Published' %}selected{% endif
+                                        %}>Published</option>
+                                    <option value="Accepted" {% if current_filters.status=='Accepted' %}selected{% endif %}>
+                                        Accepted</option>
+                                    <option value="Submitted" {% if current_filters.status=='Submitted' %}selected{% endif
+                                        %}>Submitted</option>
+                                    <option value="Rejected" {% if current_filters.status=='Rejected' %}selected{% endif %}>
+                                        Rejected</option>
+                                    <option value="Working Process" {% if current_filters.status=='Working Process'
+                                        %}selected{% endif %}>Working Process</option>
+                                </select>
                             </div>
-                        </div>
 
-                        <div class="mb-3">
-                            <label class="form-label fw-bold small text-muted text-uppercase text-primary">Collaborative
-                                Authors</label>
-                            <div class="input-group input-group-sm">
-                                <span class="input-group-text bg-white border-end-0">
-                                    <i class="bi bi-people text-primary"></i>
-                                </span>
-                                <input type="text" name="collab_author"
-                                    class="form-control border-start-0 filter-trigger shadow-none"
-                                    placeholder="Search collaborators..."
-                                    value="{{ current_filters.collab_author or '' }}">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold small text-muted">Journal Status</label>
+                                <select name="journal_status" class="form-select form-select-sm filter-trigger shadow-none">
+                                    <option value="">All</option>
+                                    <option value="Published" {% if current_filters.journal_status=='Published' %}selected{%
+                                        endif %}>Published</option>
+                                    <option value="Accepted" {% if current_filters.journal_status=='Accepted' %}selected{%
+                                        endif %}>Accepted</option>
+                                    <option value="Submitted" {% if current_filters.journal_status=='Submitted' %}selected{%
+                                        endif %}>Submitted</option>
+                                </select>
                             </div>
-                        </div>
 
-                        <div class="mb-3">
-                            <label
-                                class="form-label fw-bold small text-muted text-uppercase text-primary">Publisher</label>
-                            <div class="input-group input-group-sm">
-                                <span class="input-group-text bg-white border-end-0">
-                                    <i class="bi bi-building text-primary"></i>
-                                </span>
-                                <input type="text" name="publisher"
-                                    class="form-control border-start-0 filter-trigger shadow-none"
-                                    placeholder="Search publisher..." value="{{ current_filters.publisher or '' }}">
-                            </div>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label fw-bold small text-muted text-uppercase text-primary">Journal
-                                Name</label>
-                            <div class="input-group input-group-sm">
-                                <span class="input-group-text bg-white border-end-0">
-                                    <i class="bi bi-journal-text text-primary"></i>
-                                </span>
-                                <input type="text" name="journal_name"
-                                    class="form-control border-start-0 filter-trigger shadow-none"
-                                    placeholder="Search journal..." value="{{ current_filters.journal_name or '' }}">
-                            </div>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label fw-bold small text-muted text-uppercase text-primary">ISSN</label>
-                            <div class="input-group input-group-sm">
-                                <span class="input-group-text bg-white border-end-0">
-                                    <i class="bi bi-upc text-primary"></i>
-                                </span>
-                                <input type="text" name="issn"
-                                    class="form-control border-start-0 filter-trigger shadow-none"
-                                    placeholder="Search ISSN..." value="{{ current_filters.issn or '' }}">
-                            </div>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label fw-bold small text-muted text-uppercase text-primary">Year</label>
-                            <div class="input-group input-group-sm">
-                                <span class="input-group-text bg-white border-end-0">
-                                    <i class="bi bi-calendar text-primary"></i>
-                                </span>
-                                <input type="text" name="year"
-                                    class="form-control border-start-0 filter-trigger shadow-none"
-                                    placeholder="e.g. 2024" value="{{ current_filters.year or '' }}">
-                            </div>
-                        </div>
-
-                        <hr class="my-3" style="border-top: 2px dashed #eee;">
-
-                        <!-- Dropdown Filters -->
-                        <div class="mb-3">
-                            <label class="form-label fw-bold small text-muted text-uppercase">Paper Status</label>
-                            <select name="status" class="form-select form-select-sm filter-trigger shadow-none">
-                                <option value="">All Statuses</option>
-                                <option value="Published" {% if current_filters.status=='Published' %}selected{% endif
-                                    %}>Published</option>
-                                <option value="Accepted" {% if current_filters.status=='Accepted' %}selected{% endif %}>
-                                    Accepted</option>
-                                <option value="Submitted" {% if current_filters.status=='Submitted' %}selected{% endif
-                                    %}>Submitted</option>
-                                <option value="Rejected" {% if current_filters.status=='Rejected' %}selected{% endif %}>
-                                    Rejected</option>
-                                <option value="Working Process" {% if current_filters.status=='Working Process'
-                                    %}selected{% endif %}>Working Process</option>
-                            </select>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label fw-bold small text-muted text-uppercase">Journal Status</label>
-                            <select name="journal_status" class="form-select form-select-sm filter-trigger shadow-none">
-                                <option value="">All</option>
-                                <option value="Published" {% if current_filters.journal_status=='Published' %}selected{%
-                                    endif %}>Published</option>
-                                <option value="Accepted" {% if current_filters.journal_status=='Accepted' %}selected{%
-                                    endif %}>Accepted</option>
-                                <option value="Submitted" {% if current_filters.journal_status=='Submitted' %}selected{%
-                                    endif %}>Submitted</option>
-                            </select>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label fw-bold small text-muted text-uppercase">Department</label>
-                            <select name="dept" class="form-select form-select-sm filter-trigger shadow-none">
-                                <option value="">All Departments</option>
-                                <option value="AIDS" {% if current_filters.dept=='AIDS' %}selected{% endif %}>AIDS
-                                </option>
-                                <option value="AIML" {% if current_filters.dept=='AIML' %}selected{% endif %}>AIML
-                                </option>
-                                <option value="CSBS" {% if current_filters.dept=='CSBS' %}selected{% endif %}>CSBS
-                                </option>
-                                <option value="CSE" {% if current_filters.dept=='CSE' %}selected{% endif %}>CSE</option>
-                                <option value="CYS" {% if current_filters.dept=='CYS' %}selected{% endif %}>CYS</option>
-                                <option value="ECE" {% if current_filters.dept=='ECE' %}selected{% endif %}>ECE</option>
-                                <option value="IT" {% if current_filters.dept=='IT' %}selected{% endif %}>IT</option>
-                                <option value="MECH" {% if current_filters.dept=='MECH' %}selected{% endif %}>MECH
-                                </option>
-                                <option value="RA" {% if current_filters.dept=='RA' %}selected{% endif %}>RA</option>
-                                <option value="S&H" {% if current_filters.dept=='S&H' %}selected{% endif %}>S&H</option>
-                                {% for dept in depts %}
-                                {% if dept.department not in ['AIDS', 'AIML', 'CSBS', 'CSE', 'CYS', 'ECE', 'IT', 'MECH',
-                                'RA', 'S&H'] %}
-                                <option value="{{ dept.department }}" {% if current_filters.dept==dept.department
-                                    %}selected{% endif %}>
-                                    {{ dept.department }}
-                                </option>
-                                {% endif %}
-                                {% endfor %}
-                            </select>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label fw-bold small text-muted text-uppercase">Publication Type</label>
-                            <select name="type" class="form-select form-select-sm filter-trigger shadow-none">
-                                <option value="">All Categories</option>
-                                <option value="Journal" {% if current_filters.type=='Journal' %}selected{% endif %}>
-                                    Journal</option>
-                                <option value="Paper" {% if current_filters.type=='Paper' %}selected{% endif %}>Paper
-                                </option>
-                                <option value="Book" {% if current_filters.type=='Book' %}selected{% endif %}>Book
-                                </option>
-                            </select>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label fw-bold small text-muted text-uppercase">Scope</label>
-                            <select name="scope" class="form-select form-select-sm filter-trigger shadow-none">
-                                <option value="">All</option>
-                                <option value="International" {% if current_filters.scope=='International' %}selected{%
-                                    endif %}>International</option>
-                                <option value="National" {% if current_filters.scope=='National' %}selected{% endif %}>
-                                    National</option>
-                            </select>
-                        </div>
-
-                        <hr class="my-3" style="border-top: 2px dashed #eee;">
-
-                        <!-- Indexing Filters -->
-                        <label class="form-label fw-bold small text-muted text-uppercase">Indexing</label>
-                        <div class="row g-2 mb-3">
-                            <div class="col-4">
-                                <select name="scopus" class="form-select form-select-sm filter-trigger shadow-none">
-                                    <option value="">Scopus</option>
-                                    <option value="1" {% if current_filters.scopus=='1' %}selected{% endif %}>✓ Yes
+                            <div class="mb-3">
+                                <label class="form-label fw-bold small text-muted">Publication Type</label>
+                                <select name="type" class="form-select form-select-sm filter-trigger shadow-none">
+                                    <option value="">All Categories</option>
+                                    <option value="Journal" {% if current_filters.type=='Journal' %}selected{% endif %}>
+                                        Journal</option>
+                                    <option value="Paper" {% if current_filters.type=='Paper' %}selected{% endif %}>Paper
                                     </option>
-                                    <option value="0" {% if current_filters.scopus=='0' %}selected{% endif %}>✗ No
+                                    <option value="Book" {% if current_filters.type=='Book' %}selected{% endif %}>Book
                                     </option>
                                 </select>
                             </div>
-                            <div class="col-4">
-                                <select name="sci" class="form-select form-select-sm filter-trigger shadow-none">
-                                    <option value="">SCI</option>
-                                    <option value="1" {% if current_filters.sci=='1' %}selected{% endif %}>✓ Yes
-                                    </option>
-                                    <option value="0" {% if current_filters.sci=='0' %}selected{% endif %}>✗ No</option>
-                                </select>
-                            </div>
-                            <div class="col-4">
-                                <select name="wos" class="form-select form-select-sm filter-trigger shadow-none">
-                                    <option value="">WoS</option>
-                                    <option value="1" {% if current_filters.wos=='1' %}selected{% endif %}>✓ Yes
-                                    </option>
-                                    <option value="0" {% if current_filters.wos=='0' %}selected{% endif %}>✗ No</option>
+
+                            <div>
+                                <label class="form-label fw-bold small text-muted">Scope</label>
+                                <select name="scope" class="form-select form-select-sm filter-trigger shadow-none">
+                                    <option value="">All</option>
+                                    <option value="International" {% if current_filters.scope=='International' %}selected{%
+                                        endif %}>International</option>
+                                    <option value="National" {% if current_filters.scope=='National' %}selected{% endif %}>
+                                        National</option>
                                 </select>
                             </div>
                         </div>
 
-                        <div class="d-grid gap-2">
-                            <button type="submit" class="btn btn-primary btn-sm">Apply Filters</button>
-                            <a href="/excel_dashboard" class="btn btn-outline-secondary btn-sm">Clear All</a>
+                        <hr class="my-0">
+
+                        <!-- Organization Section -->
+                        <div class="mb-4 mt-4">
+                            <h6 class="text-uppercase fw-bold text-muted small mb-3 pb-2 border-bottom">
+                                <i class="bi bi-building text-success me-1"></i>Organization
+                            </h6>
+
+                            <div>
+                                <label class="form-label fw-bold small text-muted">Department</label>
+                                <select name="dept" class="form-select form-select-sm filter-trigger shadow-none">
+                                    <option value="">All Departments</option>
+                                    <option value="AIDS" {% if current_filters.dept=='AIDS' %}selected{% endif %}>AIDS
+                                    </option>
+                                    <option value="AIML" {% if current_filters.dept=='AIML' %}selected{% endif %}>AIML
+                                    </option>
+                                    <option value="CSBS" {% if current_filters.dept=='CSBS' %}selected{% endif %}>CSBS
+                                    </option>
+                                    <option value="CSE" {% if current_filters.dept=='CSE' %}selected{% endif %}>CSE</option>
+                                    <option value="CYS" {% if current_filters.dept=='CYS' %}selected{% endif %}>CYS</option>
+                                    <option value="ECE" {% if current_filters.dept=='ECE' %}selected{% endif %}>ECE</option>
+                                    <option value="IT" {% if current_filters.dept=='IT' %}selected{% endif %}>IT</option>
+                                    <option value="MECH" {% if current_filters.dept=='MECH' %}selected{% endif %}>MECH
+                                    </option>
+                                    <option value="RA" {% if current_filters.dept=='RA' %}selected{% endif %}>RA</option>
+                                    <option value="S&H" {% if current_filters.dept=='S&H' %}selected{% endif %}>S&H</option>
+                                    {% for dept in depts %}
+                                    {% if dept.department not in ['AIDS', 'AIML', 'CSBS', 'CSE', 'CYS', 'ECE', 'IT', 'MECH',
+                                    'RA', 'S&H'] %}
+                                    <option value="{{ dept.department }}" {% if current_filters.dept==dept.department
+                                        %}selected{% endif %}>
+                                        {{ dept.department }}
+                                    </option>
+                                    {% endif %}
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+
+                        <hr class="my-0">
+
+                        <!-- Indexing Section -->
+                        <div class="mb-4 mt-4">
+                            <h6 class="text-uppercase fw-bold text-muted small mb-3 pb-2 border-bottom">
+                                <i class="bi bi-bookmark-check text-warning me-1"></i>Indexing
+                            </h6>
+                            
+                            <div class="row g-2">
+                                <div class="col-6">
+                                    <label class="form-label fw-bold small text-muted d-block">Scopus</label>
+                                    <select name="scopus" class="form-select form-select-sm filter-trigger shadow-none">
+                                        <option value="">All</option>
+                                        <option value="1" {% if current_filters.scopus=='1' %}selected{% endif %}>
+                                            <i class="bi bi-check-lg"></i> Yes
+                                        </option>
+                                        <option value="0" {% if current_filters.scopus=='0' %}selected{% endif %}>No</option>
+                                    </select>
+                                </div>
+                                <div class="col-6">
+                                    <label class="form-label fw-bold small text-muted d-block">SCI/SCIE</label>
+                                    <select name="sci" class="form-select form-select-sm filter-trigger shadow-none">
+                                        <option value="">All</option>
+                                        <option value="1" {% if current_filters.sci=='1' %}selected{% endif %}>
+                                            <i class="bi bi-check-lg"></i> Yes
+                                        </option>
+                                        <option value="0" {% if current_filters.sci=='0' %}selected{% endif %}>No</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="row g-2 mt-2">
+                                <div class="col-6">
+                                    <label class="form-label fw-bold small text-muted d-block">Web of Science</label>
+                                    <select name="wos" class="form-select form-select-sm filter-trigger shadow-none">
+                                        <option value="">All</option>
+                                        <option value="1" {% if current_filters.wos=='1' %}selected{% endif %}>
+                                            <i class="bi bi-check-lg"></i> Yes
+                                        </option>
+                                        <option value="0" {% if current_filters.wos=='0' %}selected{% endif %}>No</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr class="my-0">
+
+                        <!-- Action Buttons -->
+                        <div class="d-grid gap-2 mt-4">
+                            <button type="submit" class="btn btn-primary btn-sm fw-bold">
+                                <i class="bi bi-funnel me-1"></i>Apply Filters
+                            </button>
+                            <a href="/excel_dashboard" class="btn btn-outline-secondary btn-sm fw-bold">
+                                <i class="bi bi-arrow-clockwise me-1"></i>Clear All
+                            </a>
                         </div>
                     </form>
                 </div>
             </div>
 
             <!-- Data Display Area -->
-            <div class="col-lg-9 col-md-8">
+            <div class="col-lg-9 col-md-8" id="dataDisplayArea">
                 <div class="card border-0 shadow-sm">
-                    <div class="card-header bg-white py-3">
+                    <div class="card-header bg-white py-3 px-4">
                         <div class="d-flex justify-content-between align-items-center">
                             <div class="d-flex align-items-center">
+                                <button type="button" class="btn btn-sm btn-outline-primary me-2" id="toggleFilterBtnData" title="Show filters">
+                                    <i class="bi bi-chevron-right"></i>
+                                </button>
                                 <h6 class="fw-bold mb-0 me-2 text-nowrap">Filtered Results ({{ journals|length }})</h6>
                                 {% if current_filters.dept %}
                                 <span
@@ -333,8 +381,12 @@
                                         <i class="bi bi-download"></i> Export
                                     </button>
                                     <ul class="dropdown-menu">
-                                        <li><a class="dropdown-item" href="#">Download as Excel</a></li>
-                                        <li><a class="dropdown-item" href="#">Download as CSV</a></li>
+                                        <li><a class="dropdown-item" href="#" onclick="downloadExcel(); return false;">
+                                            <i class="bi bi-file-earmark-excel text-success me-2"></i>Download as Excel
+                                        </a></li>
+                                        <li><a class="dropdown-item" href="#" onclick="downloadCSV(); return false;">
+                                            <i class="bi bi-file-earmark-csv text-primary me-2"></i>Download as CSV
+                                        </a></li>
                                     </ul>
                                 </div>
                             </div>
@@ -601,6 +653,25 @@
             box-shadow: 0 0 0 0.25rem rgba(102, 126, 234, 0.25);
         }
 
+        /* Filter sidebar toggle */
+        #filterSidebar {
+            transition: all 0.3s ease;
+        }
+
+        #filterSidebar.d-none {
+            display: none !important;
+        }
+
+        #dataDisplayArea {
+            transition: all 0.3s ease;
+        }
+
+        #dataDisplayArea.col-lg-9.full-width {
+            grid-column: 1 / -1;
+            flex: 0 0 100%;
+            max-width: 100%;
+        }
+
         /* Excel-like table styling */
         .excel-table-wrapper {
             overflow-x: auto;
@@ -693,6 +764,43 @@
     </style>
 
     <script>
+        // Filter Toggle Functionality
+        const toggleFilterBtn = document.getElementById('toggleFilterBtn');
+        const toggleFilterBtnData = document.getElementById('toggleFilterBtnData');
+        const filterSidebar = document.getElementById('filterSidebar');
+        const dataDisplayArea = document.getElementById('dataDisplayArea');
+        const filterDataRow = document.getElementById('filterDataRow');
+
+        // Hide filter sidebar
+        if (toggleFilterBtn) {
+            toggleFilterBtn.addEventListener('click', function () {
+                filterSidebar.classList.add('d-none');
+                dataDisplayArea.classList.add('full-width');
+                filterDataRow.classList.add('filter-hidden');
+                localStorage.setItem('filterVisibility', 'hidden');
+            });
+        }
+
+        // Show filter sidebar
+        if (toggleFilterBtnData) {
+            toggleFilterBtnData.addEventListener('click', function () {
+                filterSidebar.classList.remove('d-none');
+                dataDisplayArea.classList.remove('full-width');
+                filterDataRow.classList.remove('filter-hidden');
+                localStorage.setItem('filterVisibility', 'visible');
+            });
+        }
+
+        // Check localStorage to restore previous state
+        window.addEventListener('load', function () {
+            const filterVisibility = localStorage.getItem('filterVisibility');
+            if (filterVisibility === 'hidden') {
+                filterSidebar.classList.add('d-none');
+                dataDisplayArea.classList.add('full-width');
+                filterDataRow.classList.add('filter-hidden');
+            }
+        });
+
         document.addEventListener('DOMContentLoaded', function () {
             const fileInput = document.getElementById('excel_file_input');
             const fileInfo = document.getElementById('fileInfo');
@@ -909,6 +1017,35 @@
                     console.error('Error:', error);
                     alert('An unexpected error occurred during batch deletion.');
                 });
+        }
+
+        // Download functions
+        function downloadExcel() {
+            const filterForm = document.getElementById('filterForm');
+            const formData = new FormData(filterForm);
+            const searchParams = new URLSearchParams(formData);
+            
+            // Add export type
+            const url = `/export_results?type=excel&${searchParams.toString()}`;
+            
+            // Create temporary link and trigger download
+            const link = document.createElement('a');
+            link.href = url;
+            link.click();
+        }
+
+        function downloadCSV() {
+            const filterForm = document.getElementById('filterForm');
+            const formData = new FormData(filterForm);
+            const searchParams = new URLSearchParams(formData);
+            
+            // Add export type
+            const url = `/export_results?type=csv&${searchParams.toString()}`;
+            
+            // Create temporary link and trigger download
+            const link = document.createElement('a');
+            link.href = url;
+            link.click();
         }
     </script>
     {% endblock %}

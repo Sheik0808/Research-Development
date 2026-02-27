@@ -46,7 +46,7 @@
             <tbody>
                 {% for j in journals %}
                 <tr>
-                    <td>{{ j.id }}</td>
+                    <td><strong>{{ loop.index }}</strong></td>
                     <td>
                         <span title="{{ j.created_at }}">
                             {{ j.created_at[:10] if j.created_at else 'N/A' }}<br>

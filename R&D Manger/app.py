@@ -129,12 +129,14 @@ def login():
                 session['full_name'] = user['full_name']
                 session['is_first_visit'] = True
                 
-                # Log the login time
+                # Log the login details
+                ip_addr = request.remote_addr
+                user_agent = request.user_agent.string
                 conn = get_db_connection()
                 conn.execute("""
-                    INSERT INTO login_logs (user_id, username, full_name, role, login_time)
-                    VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)
-                """, (user['id'], user['username'], user['full_name'], user['role']))
+                    INSERT INTO login_logs (user_id, username, full_name, role, login_time, ip_address, device_info)
+                    VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP, ?, ?)
+                """, (user['id'], user['username'], user['full_name'], user['role'], ip_addr, user_agent))
                 conn.commit()
                 conn.close()
                 
@@ -205,6 +207,25 @@ def signup():
 
 @app.route('/logout')
 def logout():
+    # Record logout time if user is logged in
+    if 'user_id' in session:
+        try:
+            conn = get_db_connection()
+            # Update the latest active login record for this user
+            conn.execute("""
+                UPDATE login_logs 
+                SET logout_time = CURRENT_TIMESTAMP 
+                WHERE id = (
+                    SELECT id FROM login_logs 
+                    WHERE user_id = ? AND logout_time IS NULL 
+                    ORDER BY login_time DESC LIMIT 1
+                )
+            """, (session['user_id'],))
+            conn.commit()
+            conn.close()
+        except Exception as e:
+            print(f"Error recording logout: {e}")
+
     session.clear()
     return redirect(url_for('login'))
 
@@ -785,28 +806,27 @@ def upload_excel():
         file.save(file_path)
         
         try:
-            # Read first 10 rows to find header row if not first
-            temp_df = pd.read_excel(file_path, nrows=10, header=None)
-            header_row = 0
-            found_header = False
+            # Read the entire Excel file first (without assuming any header)
+            full_df = pd.read_excel(file_path, header=None)
             
-            # Simple heuristic: row with most matches for common keywords is likely the header
-            keywords_to_find = ['title', 'journal', 'author', 'dept', 'issn', 'scopus']
-            max_matches = 0
-            
-            for idx, row in temp_df.iterrows():
-                matches = sum(1 for cell in row if any(kw in str(cell).lower() for kw in keywords_to_find))
-                if matches > max_matches:
-                    max_matches = matches
-                    header_row = idx
-                    found_header = True if matches >= 2 else False
-
-            # Read again with detected header row
-            df = pd.read_excel(file_path, header=header_row)
-            if df.empty:
+            if full_df.empty:
                 return jsonify({'success': False, 'error': 'The Excel file is empty'}), 400
             
-            # Normalize column names: trim and lowercase
+            # Auto-detect header row by finding row with most matching keywords
+            keywords_to_find = ['title', 'journal', 'author', 'dept', 'issn', 'scopus', 'department', 'name']
+            header_row_idx = 0
+            max_matches = 0
+            
+            for idx, row in full_df.iterrows():
+                matches = sum(1 for cell in row if pd.notna(cell) and any(kw in str(cell).lower() for kw in keywords_to_find))
+                if matches > max_matches:
+                    max_matches = matches
+                    header_row_idx = idx
+            
+            # Use detected header row
+            df = pd.read_excel(file_path, header=header_row_idx)
+            
+            # Normalize column names
             df.columns = [str(c).strip().lower() for c in df.columns]
             
             conn = get_db_connection()
@@ -975,6 +995,226 @@ def login_history():
     
     conn.close()
     return render_template('login_history.html', login_logs=login_logs, title=title)
+
+# ================ EXPORT FUNCTIONALITY ================
+from flask import send_file
+from io import BytesIO
+
+@app.route('/export_results', methods=['GET'])
+@login_required
+def export_results():
+    """Export filtered results to Excel or CSV"""
+    export_type = request.args.get('type', 'excel').lower()
+    
+    conn = get_db_connection()
+    
+    # Get filter parameters (same as excel_dashboard)
+    dept_filter = request.args.get('dept', '')
+    type_filter = request.args.get('type_pub', '')
+    status_filter = request.args.get('status', '')
+    author_filter = request.args.get('author', '')
+    title_filter = request.args.get('title', '')
+    publisher_filter = request.args.get('publisher', '')
+    journal_filter = request.args.get('journal_name', '')
+    scope_filter = request.args.get('scope', '')
+    issn_filter = request.args.get('issn', '')
+    scopus_filter = request.args.get('scopus', '')
+    sci_filter = request.args.get('sci', '')
+    wos_filter = request.args.get('wos', '')
+    year_filter = request.args.get('year', '')
+    collab_author_filter = request.args.get('collab_author', '')
+    journal_status_filter = request.args.get('journal_status', '')
+    
+    query = 'SELECT * FROM journals WHERE 1=1'
+    params = []
+    
+    if dept_filter:
+        query += ' AND department = ?'
+        params.append(dept_filter)
+    if type_filter:
+        query += ' AND publication_type = ?'
+        params.append(type_filter)
+    if status_filter:
+        query += ' AND status = ?'
+        params.append(status_filter)
+    if author_filter:
+        query += ' AND author_name LIKE ?'
+        params.append(f'%{author_filter}%')
+    if title_filter:
+        query += ' AND paper_title LIKE ?'
+        params.append(f'%{title_filter}%')
+    if publisher_filter:
+        query += ' AND publisher LIKE ?'
+        params.append(f'%{publisher_filter}%')
+    if journal_filter:
+        query += ' AND journal_name LIKE ?'
+        params.append(f'%{journal_filter}%')
+    if scope_filter:
+        query += ' AND journal_scope = ?'
+        params.append(scope_filter)
+    if issn_filter:
+        query += ' AND issn_number LIKE ?'
+        params.append(f'%{issn_filter}%')
+    if scopus_filter:
+        query += ' AND is_scopus = ?'
+        params.append(int(scopus_filter))
+    if sci_filter:
+        query += ' AND is_sci_scie_ssci = ?'
+        params.append(int(sci_filter))
+    if wos_filter:
+        query += ' AND is_wos = ?'
+        params.append(int(wos_filter))
+    if year_filter:
+        query += ' AND (publication_year = ? OR month_year LIKE ?)'
+        params.append(year_filter)
+        params.append(f'%{year_filter}%')
+    if collab_author_filter:
+        query += ' AND collaborative_authors LIKE ?'
+        params.append(f'%{collab_author_filter}%')
+    if journal_status_filter:
+        query += ' AND journal_status = ?'
+        params.append(journal_status_filter)
+    
+    query += ' ORDER BY department ASC, paper_title ASC'
+    journals = conn.execute(query, params).fetchall()
+    conn.close()
+    
+    # Convert to DataFrame
+    df = pd.DataFrame([dict(j) for j in journals])
+    
+    if df.empty:
+        return jsonify({'success': False, 'error': 'No data to export'}), 400
+    
+    # Reorder columns for better readability
+    column_order = [
+        'department', 'author_name', 'collaborative_authors', 'paper_title', 
+        'publisher', 'journal_name', 'journal_scope', 'publication_year', 
+        'issn_number', 'status', 'journal_status', 'publication_type',
+        'is_scopus', 'is_sci_scie_ssci', 'is_wos', 'impact_factor'
+    ]
+    
+    # Keep only columns that exist
+    existing_cols = [col for col in column_order if col in df.columns]
+    df = df[existing_cols]
+    
+    # Clean boolean columns
+    bool_cols = ['is_scopus', 'is_sci_scie_ssci', 'is_wos']
+    for col in bool_cols:
+        if col in df.columns:
+            df[col] = df[col].apply(lambda x: 'Yes' if x == 1 else 'No')
+    
+    # Generate filename with timestamp
+    from datetime import datetime
+    timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+    
+    try:
+        if export_type == 'csv':
+            # Export to CSV
+            output = BytesIO()
+            df.to_csv(output, index=False, encoding='utf-8')
+            output.seek(0)
+            return send_file(output, 
+                           mimetype='text/csv', 
+                           as_attachment=True, 
+                           download_name=f'research_data_{timestamp}.csv')
+        else:
+            # Export to Excel with proper formatting
+            from openpyxl import load_workbook
+            from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
+            from openpyxl.utils import get_column_letter
+            
+            output = BytesIO()
+            with pd.ExcelWriter(output, engine='openpyxl') as writer:
+                df.to_excel(writer, sheet_name='Research Data', index=False, startrow=0)
+                
+                # Get the workbook and worksheet
+                workbook = writer.book
+                worksheet = writer.sheets['Research Data']
+                
+                # Define styles
+                header_font = Font(bold=True, color='FFFFFF', size=11)
+                header_fill = PatternFill(start_color='0070C0', end_color='0070C0', fill_type='solid')
+                header_alignment = Alignment(horizontal='center', vertical='center', wrap_text=True)
+                
+                data_alignment = Alignment(horizontal='left', vertical='top', wrap_text=True)
+                border_style = Border(
+                    left=Side(style='thin', color='D3D3D3'),
+                    right=Side(style='thin', color='D3D3D3'),
+                    top=Side(style='thin', color='D3D3D3'),
+                    bottom=Side(style='thin', color='D3D3D3')
+                )
+                
+                # Apply header formatting
+                for col_num, column_title in enumerate(df.columns, 1):
+                    cell = worksheet.cell(row=1, column=col_num)
+                    cell.font = header_font
+                    cell.fill = header_fill
+                    cell.alignment = header_alignment
+                    cell.border = border_style
+                
+                # Set column widths and apply formatting to data rows
+                column_widths = {
+                    'department': 12,
+                    'author_name': 20,
+                    'collaborative_authors': 30,
+                    'paper_title': 40,
+                    'publisher': 20,
+                    'journal_name': 25,
+                    'journal_scope': 15,
+                    'publication_year': 15,
+                    'issn_number': 15,
+                    'status': 15,
+                    'journal_status': 15,
+                    'publication_type': 15,
+                    'is_scopus': 12,
+                    'is_sci_scie_ssci': 15,
+                    'is_wos': 12,
+                    'impact_factor': 15,
+                    'vol_issue_page': 20,
+                    'month_year': 15,
+                    'author_position': 15,
+                    'collab_scope': 15,
+                    'collab_institution': 25,
+                    'citation_score': 15,
+                    'sjr_rating': 15,
+                    'h_index': 12,
+                    'anna_univ_list': 15,
+                    'preview_link': 25,
+                    'home_page_link': 25,
+                    'doi_link': 25
+                }
+                
+                # Apply column widths and data formatting
+                for col_num, column_title in enumerate(df.columns, 1):
+                    col_letter = get_column_letter(col_num)
+                    
+                    # Set column width
+                    width = column_widths.get(column_title, 18)
+                    worksheet.column_dimensions[col_letter].width = width
+                    
+                    # Apply formatting to data cells
+                    for row_num in range(2, len(df) + 2):
+                        cell = worksheet.cell(row=row_num, column=col_num)
+                        cell.alignment = data_alignment
+                        cell.border = border_style
+                
+                # Freeze header row
+                worksheet.freeze_panes = 'A2'
+                
+                # Set row height for header
+                worksheet.row_dimensions[1].height = 30
+                
+                # Set auto row height for data rows
+                for row_num in range(2, len(df) + 2):
+                    worksheet.row_dimensions[row_num].height = None  # Auto height
+            
+            output.seek(0)
+            return send_file(output, 
+                           mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 
+                           as_attachment=True, 
+                           download_name=f'research_data_{timestamp}.xlsx')
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
 
 # ---------------- RUN ----------------
 if __name__ == '__main__':

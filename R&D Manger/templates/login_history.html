@@ -23,7 +23,8 @@
                     <div style="display: flex; justify-content: space-between; align-items: center;">
                         <div>
                             <h6 style="color: #666; margin: 0; font-size: 12px;">Total Logins</h6>
-                            <h3 style="color: #667eea; margin: 5px 0 0 0; font-weight: bold;">{{ login_logs|length }}</h3>
+                            <h3 style="color: #667eea; margin: 5px 0 0 0; font-weight: bold;">{{ login_logs|length }}
+                            </h3>
                         </div>
                         <i class="bi bi-person-check" style="font-size: 32px; color: #667eea; opacity: 0.3;"></i>
                     </div>
@@ -38,9 +39,9 @@
                             <h6 style="color: #666; margin: 0; font-size: 12px;">Last Login</h6>
                             <p style="color: #28a745; margin: 5px 0 0 0; font-weight: bold;">
                                 {% if login_logs %}
-                                    {{ login_logs[0].login_time[:10] if login_logs[0].login_time else 'N/A' }}
+                                {{ login_logs[0].login_time[:10] if login_logs[0].login_time else 'N/A' }}
                                 {% else %}
-                                    No logins yet
+                                No logins yet
                                 {% endif %}
                             </p>
                         </div>
@@ -84,7 +85,8 @@
 
     <!-- Login History Table -->
     <div class="card" style="border: none; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.08);">
-        <div class="card-header" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 10px 10px 0 0; padding: 20px;">
+        <div class="card-header"
+            style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 10px 10px 0 0; padding: 20px;">
             <h5 style="margin: 0; font-weight: bold;">
                 <i class="bi bi-table me-2"></i>Login Records
             </h5>
@@ -102,53 +104,65 @@
                                 <i class="bi bi-shield-check me-2"></i>Role
                             </th>
                             <th style="color: #667eea; font-weight: bold; padding: 15px;">
-                                <i class="bi bi-calendar-event me-2"></i>Login Date
+                                <i class="bi bi-calendar-event me-2"></i>Login Time
                             </th>
                             <th style="color: #667eea; font-weight: bold; padding: 15px;">
-                                <i class="bi bi-clock me-2"></i>Login Time
+                                <i class="bi bi-laptop me-2"></i>IP Address
                             </th>
                             <th style="color: #667eea; font-weight: bold; padding: 15px;">
-                                <i class="bi bi-info-circle me-2"></i>Duration
+                                <i class="bi bi-info-circle me-2"></i>Status / Logout
                             </th>
                         </tr>
                     </thead>
                     <tbody>
                         {% if login_logs %}
-                            {% for log in login_logs %}
-                            <tr style="border-bottom: 1px solid #e9ecef;">
-                                <td style="padding: 15px; color: #666;">{{ loop.index }}</td>
-                                <td style="padding: 15px;">
-                                    <div style="font-weight: 600; color: #333;">{{ log.full_name }}</div>
-                                    <div style="font-size: 12px; color: #999;">{{ log.username }}</div>
-                                </td>
-                                <td style="padding: 15px;">
-                                    <span class="badge" style="
+                        {% for log in login_logs %}
+                        <tr style="border-bottom: 1px solid #e9ecef;">
+                            <td style="padding: 15px; color: #666;">{{ loop.index }}</td>
+                            <td style="padding: 15px;">
+                                <div style="font-weight: 600; color: #333;">{{ log.full_name }}</div>
+                                <div style="font-size: 12px; color: #999;">
+                                    <span title="{{ log.device_info or 'Unknown device' }}">{{ log.username }}</span>
+                                </div>
+                            </td>
+                            <td style="padding: 15px;">
+                                <span class="badge" style="
                                         background-color: {% if log.role == 'admin' %}#ff6b6b{% elif log.role == 'faculty' %}#667eea{% else %}#28a745{% endif %};
                                         padding: 6px 12px;
                                         font-weight: 600;
                                     ">
-                                        {{ log.role.upper() }}
-                                    </span>
-                                </td>
-                                <td style="padding: 15px;">
-                                    <i class="bi bi-calendar"></i> 
-                                    <strong>{{ log.login_time[:10] if log.login_time else 'N/A' }}</strong>
-                                </td>
-                                <td style="padding: 15px;">
-                                    <i class="bi bi-clock"></i> 
-                                    <strong>{{ log.login_time[11:19] if log.login_time else 'N/A' }}</strong>
-                                </td>
-                                <td style="padding: 15px;">
-                                    <span style="color: #666; font-size: 12px;">
-                                        {% if log.logout_time %}
-                                            Active
-                                        {% else %}
-                                            Still Logged In
-                                        {% endif %}
-                                    </span>
-                                </td>
-                            </tr>
-                            {% endfor %}
+                                    {{ log.role.upper() }}
+                                </span>
+                            </td>
+                            <td style="padding: 15px;">
+                                <div style="font-weight: bold; color: #333;">
+                                    <i class="bi bi-calendar me-1"></i>{{ log.login_time[:10] if log.login_time else
+                                    'N/A' }}
+                                </div>
+                                <div style="font-size: 12px; color: #666;">
+                                    <i class="bi bi-clock me-1"></i>{{ log.login_time[11:19] if log.login_time else
+                                    'N/A' }}
+                                </div>
+                            </td>
+                            <td style="padding: 15px; color: #666; font-size: 13px;">
+                                <i class="bi bi-globe me-1"></i>{{ log.ip_address or 'N/A' }}
+                            </td>
+                            <td style="padding: 15px;">
+                                {% if log.logout_time %}
+                                <div style="color: #666; font-size: 12px;">
+                                    <i class="bi bi-door-closed me-1"></i>Logout: {{ log.logout_time[11:19] }}
+                                </div>
+                                <div style="font-size: 11px; color: #999;">
+                                    {{ log.logout_time[:10] }}
+                                </div>
+                                {% else %}
+                                <span class="badge bg-success">
+                                    <i class="bi bi-circle-fill me-1" style="font-size: 8px;"></i>Active
+                                </span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
                         {% else %}
                         <tr>
                             <td colspan="6" class="text-center p-5">
@@ -178,7 +192,8 @@
                     <ul style="list-style: none; padding: 0; margin: 0;">
                         <li style="padding: 10px 0; border-bottom: 1px solid #f0f0f0;">
                             <strong style="color: #333;">Total Login Sessions:</strong>
-                            <span style="float: right; color: #667eea; font-weight: bold;">{{ login_logs|length }}</span>
+                            <span style="float: right; color: #667eea; font-weight: bold;">{{ login_logs|length
+                                }}</span>
                         </li>
                         <li style="padding: 10px 0; border-bottom: 1px solid #f0f0f0;">
                             <strong style="color: #333;">Average Per Week:</strong>
@@ -189,7 +204,8 @@
                         <li style="padding: 10px 0;">
                             <strong style="color: #333;">Current Status:</strong>
                             <span style="float: right; color: #764ba2; font-weight: bold;">
-                                <i class="bi bi-circle-fill" style="color: #28a745; font-size: 8px; margin-right: 5px;"></i>Active
+                                <i class="bi bi-circle-fill"
+                                    style="color: #28a745; font-size: 8px; margin-right: 5px;"></i>Active
                             </span>
                         </li>
                     </ul>
@@ -205,7 +221,8 @@
                 </div>
                 <div class="card-body">
                     <p style="color: #666; margin-bottom: 15px;">
-                        This page displays your login activity and timestamps. Each login session is automatically recorded with:
+                        This page displays your login activity and timestamps. Each login session is automatically
+                        recorded with:
                     </p>
                     <ul style="color: #666; padding-left: 20px;">
                         <li>Date and time of login</li>
@@ -221,7 +238,7 @@
 
 <style>
     .card:hover {
-        box-shadow: 0 8px 25px rgba(0,0,0,0.12) !important;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12) !important;
         transition: all 0.3s ease;
     }
 
